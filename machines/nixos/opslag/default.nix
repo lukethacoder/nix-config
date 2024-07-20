@@ -11,7 +11,6 @@
     networkmanager.enable = false;
     useDHCP = true;
     interfaces.enp1s0.useDHCP = true;
-    timeZone = vars.timeZone;
   };
 
   # internationalisation
