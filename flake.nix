@@ -9,7 +9,11 @@
     };
   };
 
-  outputs = { self, nixpkgs, ... }@inputs:
+  outputs = {
+    self,
+    nixpkgs,
+    home-manager,
+    ... }@inputs:
     {
       nixosConfigurations = {
         opslag = nixpkgs.lib.nixosSystem {
