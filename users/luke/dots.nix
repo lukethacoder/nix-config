@@ -12,8 +12,8 @@
     config = {
       allowUnfree = true;
       # allowUnfreePredicate = (_: true);
-    }
-  }
+    };
+  };
 
   imports = [
     ./gitconfig.nix
