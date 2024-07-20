@@ -101,28 +101,28 @@
     fsType = "ext4";
   };
 
-  fileSystems.${vars.cacheArray} = {
-    device = "cache";
-    fsType = "zfs";
-  };
+  # fileSystems.${vars.cacheArray} = {
+  #   device = "cache";
+  #   fsType = "zfs";
+  # };
 
   fileSystems."/mnt/data1" = {
-    device = "/dev/disk/by-label/Data1";
+    device = "/dev/disk/by-label/data1";
     fsType = "xfs";
   };
 
   fileSystems."/mnt/data2" = {
-    device = "/dev/disk/by-label/Data2";
+    device = "/dev/disk/by-label/data2";
     fsType = "xfs";
   };
 
   fileSystems."/mnt/data3" = {
-    device = "/dev/disk/by-label/Data3";
+    device = "/dev/disk/by-label/data3";
     fsType = "xfs";
   };
 
   fileSystems."/mnt/parity1" = {
-    device = "/dev/disk/by-label/Parity1";
+    device = "/dev/disk/by-label/parity1";
     fsType = "xfs";
   };
 
