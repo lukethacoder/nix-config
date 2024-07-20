@@ -171,8 +171,8 @@
       };
       mail = {
         enable = true;
-        sender = config.email.fromAddress;
-        recipient = config.email.toAddress;
+        sender = "dev+from@lukesecomb.digital";
+        recipient = "dev+to@lukesecomb.digital";
       };
     };
   };
