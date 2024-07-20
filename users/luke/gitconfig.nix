@@ -4,6 +4,7 @@
     enable = true;
     userName = "lukethacoder";
     userEmail = "13529535+lukethacoder@users.noreply.github.com";
+    signingKey = "SHA256:KPYK9mN30Qf7ui8sI7MXmvlU4uMJCuSjE4uQ3vTx1gU";
 
     extraConfig = {
       gpg = {
@@ -15,10 +16,6 @@
       commit = {
         gpgsign = true;
       };
-
-      # user = {
-      #   signingKey = "";
-      # };
     };
   };
 }
