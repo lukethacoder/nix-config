@@ -1,6 +1,6 @@
 { inputs, lib, config, pkgs, ... }:
 {
-  progams.git = {
+  programs.git = {
     enable = true;
     userName = "lukethacoder";
     userEmail = "13529535+lukethacoder@users.noreply.github.com";
