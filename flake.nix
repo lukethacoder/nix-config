@@ -28,7 +28,7 @@
             home-manager.nixosModules.home-manager
             {
               home-manager.useGLobalPkgs = false;
-              home-manager.extraSpecialArgs = { inherit inputs };
+              # home-manager.extraSpecialArgs = { inherit inputs };
               home-manager.users.luke.imports = [
                 agenix.homeManagerModules.default
                 nix-index-database.hmModules.nix-index
