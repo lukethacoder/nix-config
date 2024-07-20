@@ -23,7 +23,8 @@
             vars = import ./machines/nixos/vars.nix;
           };
           modules = [
-            # Base config and modules
+            # Base configuration and modules
+            ./modules/zfs-root
 
             # Import machine config + secrets
             ./machines/nixos
