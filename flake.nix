@@ -25,6 +25,7 @@
             # Base config and modules
 
             # Import machine config + secrets
+            ./machines/nixos
             ./machines/nixos/opslag
 
             # Users
