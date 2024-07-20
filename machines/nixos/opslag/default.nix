@@ -7,18 +7,30 @@
   ];
 
   # Bootloader
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  
-  boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" "sr_mod" ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-intel" ];
+  boot = {
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+    initrd.availableKernelModules = [
+      "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" "sr_mod"
+    ];
+    initrd.kernelModules = [ ];
+    kernelModules = [ "kvm-intel" ];
+    zfs.forceImportRoot = true;
+  };
 
-  hardware.cpu.intel.updateMicrocode = true;
-  hardware.enableRedistributableFirmware = true;
-  hardware.opengl.enable = true;
-  hardware.opengl.driSupport = true;
-  boot.zfs.forceImportRoot = true;
+  hardware = {
+    cpu.intel.updateMicrocode = true;
+    enableRedistributableFirmware = true;
+    opengl = {
+      enable = true;
+      driSupport = true;
+    };
+  };
+
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+
   
   zfs-root = {
     boot = {
@@ -45,16 +57,16 @@
     };
   };
 
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
   networking = {
     hostName = "opslag";
     networkmanager.enable = false;
     useDHCP = true;
     interfaces.enp1s0.useDHCP = true;
+    # interfaces.eno1.useDHCP = lib.mkDefault true;
+    # interfaces.eno2.useDHCP = lib.mkDefault true;
+    # interfaces.enp0s20f0u8u2c2.useDHCP = lib.mkDefault true;
   };
-  
+
   # TODO: configure HDD Fan Control https://github.com/desbma/hddfancontrol
   # services.hddfancontrol = {
   #   enable = true;
