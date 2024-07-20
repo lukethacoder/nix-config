@@ -33,7 +33,7 @@
             ./users/luke
             home-manager.nixosModules.home-manager
             {
-              home-manager.useGLobalPkgs = false;
+              home-manager.useGlobalPkgs = true;
               # home-manager.extraSpecialArgs = { inherit inputs };
               home-manager.users.luke.imports = [
                 # agenix.homeManagerModules.default
