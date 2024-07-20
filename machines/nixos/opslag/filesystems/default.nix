@@ -143,23 +143,23 @@
     fsType = "fuse.mergerfs";
   };
 
-  fileSystems.${vars.mainArray} = {
-    device = "${vars.cacheArray}:${vars.slowArray}";
-    options = [
-      "category.create=epff"
-      "defaults"
-      "allow_other"
-      "moveonenospc=1"
-      "minfreespace=500G"
-      "func.getattr=newest"
-      "fsname=user"
-      "uid=994"
-      "gid=993"
-      "umask=002"
-      "x-mount.mkdir"
-    ];
-    fsType = "fuse.mergerfs";
-  };
+  # fileSystems.${vars.mainArray} = {
+  #   device = "${vars.cacheArray}:${vars.slowArray}";
+  #   options = [
+  #     "category.create=epff"
+  #     "defaults"
+  #     "allow_other"
+  #     "moveonenospc=1"
+  #     "minfreespace=500G"
+  #     "func.getattr=newest"
+  #     "fsname=user"
+  #     "uid=994"
+  #     "gid=993"
+  #     "umask=002"
+  #     "x-mount.mkdir"
+  #   ];
+  #   fsType = "fuse.mergerfs";
+  # };
   
   
   services.smartd = {
