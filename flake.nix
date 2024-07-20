@@ -34,8 +34,8 @@
               home-manager.useGLobalPkgs = false;
               # home-manager.extraSpecialArgs = { inherit inputs };
               home-manager.users.luke.imports = [
-                agenix.homeManagerModules.default
-                nix-index-database.hmModules.nix-index
+                # agenix.homeManagerModules.default
+                # nix-index-database.hmModules.nix-index
                 ./users/luke/dots.nix
               ];
               home-manager.backupFileExtension = "bak";
