@@ -19,6 +19,14 @@
       };
     };
   };
+  
+  email = {
+    fromAddress = "dev@lukesecomb.digital";
+    toAddress = "server_announcements@mailbox.org";
+    # smtpServer = "email-smtp.eu-west-1.amazonaws.com";
+    # smtpUsername = "";
+    # smtpPasswordPath = config.age.secrets.smtpPassword.path;
+  };
 
   programs.zsh.enable = true;
 
