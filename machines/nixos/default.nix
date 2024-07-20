@@ -11,6 +11,8 @@
     };
   };
   
+  programs.git.enable = true;
+
   environment.systemPackages = with pkgs; [
     jq
     git-crypt
