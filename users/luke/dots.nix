@@ -9,10 +9,9 @@
   # systemd.user.startServices = "sd-switch";
 
   nixpkgs = {
-    overlays = [];
     config = {
       allowUnfree = true;
-      allowUnfreePredicate = (_: true);
+      # allowUnfreePredicate = (_: true);
     }
   }
 
