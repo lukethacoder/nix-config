@@ -33,12 +33,12 @@
     xkb = {
       layout = "au";
     };
+    desktopManager.gnome.enable = true;
     displayManager = {
       gdm = {
         enable = true;
         autoSuspend = false;
       };
-      gnome.enable = true;
       setupCommands = ''
         ${pkgs.xorg.xrandr}/bin/xrandr --output DP-1 --off DP-2 --off --output HDMI-1 --mode 1920x1080 --pos 0x0 --rota>      '';
     };
