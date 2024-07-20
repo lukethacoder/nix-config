@@ -13,7 +13,8 @@
     self,
     nixpkgs,
     home-manager,
-    ... }@inputs:
+    ...
+  }@inputs:
     {
       nixosConfigurations = {
         opslag = nixpkgs.lib.nixosSystem {

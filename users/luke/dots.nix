@@ -1,12 +1,13 @@
 { inputs, lib, config, pkgs, ... }:
-let home = {
+{
   home = {
     username = "luke";
     homeDirectory = "/home/luke";
     stateVersion = "24.05";
   };
-};
-in {
+  programs.home-manager.enable = true;
+  # systemd.user.startServices = "sd-switch";
+
   nixpkgs = {
     overlays = [];
     config = {
@@ -14,8 +15,6 @@ in {
       allowUnfreePredicate = (_: true);
     }
   }
-
-  home = home;
 
   imports = [
     ./gitconfig.nix
@@ -25,8 +24,4 @@ in {
     enable = true;
     enableZshIntegration = true;
   };
-
-  programs.home-manager.enable = true;
-
-  systemd.user.startServices = "sd-switch";
 }
