@@ -7,6 +7,11 @@
         content = {
           type = "gpt";
           partitions = {
+            # boot / BIOS
+            bios = {
+              size = "100%";
+              type = "EF02";
+            };
             efi = {
               size = "1G";
               type = "EF00";
@@ -29,11 +34,6 @@
                 type = "zfs";
                 pool = "rpool";
               };
-            };
-            # BIOS - using grub "MBR" (not default "EF02")
-            boot = {
-              size = "100%";
-              type = "MBR";
             };
           };
         };
