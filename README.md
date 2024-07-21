@@ -21,11 +21,11 @@ nixos-rebuild switch
 ```
 DISK='/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_500GB_S466NX0K701415F'
 
-curl https://raw.githubusercontent.com/lukethacoder/nix-config/main/disko/default.nix \
-    -o /tmp/disko.nix
+curl https://raw.githubusercontent.com/lukethacoder/nix-config/main/disko/default.nix -o /tmp/disko.nix
+
 sed -i "s|to-be-filled-during-installation|$DISK|" /tmp/disko.nix
-nix --experimental-features "nix-command flakes" run github:nix-community/disko \
-    -- --mode disko /tmp/disko.nix
+
+nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko /tmp/disko.nix
 ```
 
 ## TODO
