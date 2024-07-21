@@ -37,74 +37,74 @@
           };
         };
       };
-    };
 
-    data1 = {
-      type = "disk";
-      device = "/dev/sda";
-      content = {
-        type = "gpt";
-        partitions = {
-          data = {
-            type = "8300";
-            content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/mnt/data1";
+      data1 = {
+        type = "disk";
+        device = "/dev/sda";
+        content = {
+          type = "gpt";
+          partitions = {
+            data = {
+              type = "8300";
+              content = {
+                type = "filesystem";
+                format = "ext4";
+                mountpoint = "/mnt/data1";
+              };
             };
           };
         };
       };
-    };
 
-    data2 = {
-      type = "disk";
-      device = "/dev/sdb";
-      content = {
-        type = "gpt";
-        partitions = {
-          data = {
-            type = "8300";
-            content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/mnt/data2";
+      data2 = {
+        type = "disk";
+        device = "/dev/sdb";
+        content = {
+          type = "gpt";
+          partitions = {
+            data = {
+              type = "8300";
+              content = {
+                type = "filesystem";
+                format = "ext4";
+                mountpoint = "/mnt/data2";
+              };
             };
           };
         };
       };
-    };
 
-    data3 = {
-      type = "disk";
-      device = "/dev/sdc";
-      content = {
-        type = "gpt";
-        partitions = {
-          data = {
-            type = "8300";
-            content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/mnt/data3";
+      data3 = {
+        type = "disk";
+        device = "/dev/sdc";
+        content = {
+          type = "gpt";
+          partitions = {
+            data = {
+              type = "8300";
+              content = {
+                type = "filesystem";
+                format = "ext4";
+                mountpoint = "/mnt/data3";
+              };
             };
           };
         };
       };
-    };
 
-    parity1 = {
-      type = "disk";
-      device = "/dev/sdd";
-      content = {
-        type = "gpt";
-        partitions = {
-          parity = {
-            type = "8300";
-            content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/mnt/parity1";
+      parity1 = {
+        type = "disk";
+        device = "/dev/sdd";
+        content = {
+          type = "gpt";
+          partitions = {
+            parity = {
+              type = "8300";
+              content = {
+                type = "filesystem";
+                format = "ext4";
+                mountpoint = "/mnt/parity1";
+              };
             };
           };
         };
