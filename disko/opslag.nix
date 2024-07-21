@@ -3,7 +3,7 @@
     disk = {
       main = {
         type = "disk";
-        device = "to-be-filled-during-installation";
+        device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_500GB_S466NX0K701415F";
         content = {
           type = "gpt";
           partitions = {
