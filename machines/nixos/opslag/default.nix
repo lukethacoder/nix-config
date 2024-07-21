@@ -6,12 +6,21 @@
     ./filesystems
   ];
 
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+
   # Bootloader
   boot = {
-    # loader = {
-      # systemd-boot.enable = true;
-      # efi.canTouchEfiVariables = true;
-    # };
+    loader = {
+      systemd-boot.enable = false;
+      efi.canTouchEfiVariables = true;
+      grub = {
+        enable = true;
+        efiSupport = true;
+        # efiInstallAsRemovable = true;
+        fsIdentifier = "label";
+        devices = [ "nodev" ];
+      };
+    };
     initrd.availableKernelModules = [
       "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" "sr_mod"
     ];
@@ -28,9 +37,6 @@
       driSupport = true;
     };
   };
-
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-
   
   zfs-root = {
     boot = {
