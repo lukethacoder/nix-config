@@ -30,9 +30,10 @@
                 pool = "rpool";
               };
             };
-            bios = {
+            # BIOS - using grub "MBR" (not default "EF02")
+            boot = {
               size = "100%";
-              type = "EF02";
+              type = "MBR";
             };
           };
         };
@@ -110,7 +111,7 @@
         };
       };
     };
-    
+
     zpool = {
       bpool = {
         type = "zpool";
