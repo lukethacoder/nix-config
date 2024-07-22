@@ -2,32 +2,8 @@
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   
-  imports = [
-    ./filesystems
-  ];
-
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-
-  # Bootloader
-  boot = {
-    loader = {
-      systemd-boot.enable = false;
-      # efi.canTouchEfiVariables = true;
-      grub = {
-        enable = true;
-        efiSupport = true;
-        efiInstallAsRemovable = true;
-        fsIdentifier = "label";
-        devices = [ "nodev" ];
-      };
-    };
-    initrd.availableKernelModules = [
-      "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" "sr_mod"
-    ];
-    initrd.kernelModules = [ ];
-    kernelModules = [ "kvm-intel" ];
-    zfs.forceImportRoot = true;
-  };
+  boot.kernelModules = [ "coretemp" "jc42" "lm78" "f71882fg" ];
+  boot.zfs.forceImportRoot = true;
 
   hardware = {
     cpu.intel.updateMicrocode = true;
@@ -37,7 +13,29 @@
       driSupport = true;
     };
   };
-  
+
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+
+  # Bootloader
+  # boot = {
+  #   loader = {
+  #     systemd-boot.enable = false;
+  #     # efi.canTouchEfiVariables = true;
+  #     grub = {
+  #       enable = true;
+  #       efiSupport = true;
+  #       efiInstallAsRemovable = true;
+  #       fsIdentifier = "label";
+  #       devices = [ "nodev" ];
+  #     };
+  #   };
+  #   initrd.availableKernelModules = [
+  #     "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" "sr_mod"
+  #   ];
+  #   initrd.kernelModules = [ ];
+  #   kernelModules = [ "kvm-intel" ];
+  #   zfs.forceImportRoot = true;
+  # };
   zfs-root = {
     boot = {
       devNodes = "/dev/disk/by-id/";
@@ -62,6 +60,10 @@
       hostId = "0730ae51";
     };
   };
+  
+  imports = [
+    ./filesystems
+  ];
 
   networking = {
     hostName = "opslag";

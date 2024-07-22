@@ -3,7 +3,8 @@
     disk = {
       main = {
         type = "disk";
-        device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_500GB_S466NX0K701415F";
+        # device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_500GB_S466NX0K701415F";
+        device = "/dev/nvme0n1";
         content = {
           type = "gpt";
           partitions = {
@@ -39,77 +40,79 @@
         };
       };
 
-      data1 = {
-        type = "disk";
-        device = "/dev/sda";
-        content = {
-          type = "gpt";
-          partitions = {
-            data = {
-              type = "8300";
-              content = {
-                type = "filesystem";
-                format = "xfs";
-                mountpoint = "/data1";
-              };
-            };
-          };
-        };
-      };
+      # DO NOT ENABLE IF YOU HAVE DATA ON YOUR HDDs
+      # running this may format and wipe your disks
+      # data1 = {
+      #   type = "disk";
+      #   device = "/dev/sda";
+      #   content = {
+      #     type = "gpt";
+      #     partitions = {
+      #       data = {
+      #         type = "8300";
+      #         content = {
+      #           type = "filesystem";
+      #           format = "xfs";
+      #           mountpoint = "/data1";
+      #         };
+      #       };
+      #     };
+      #   };
+      # };
 
-      data2 = {
-        type = "disk";
-        device = "/dev/sdb";
-        content = {
-          type = "gpt";
-          partitions = {
-            data = {
-              type = "8300";
-              content = {
-                type = "filesystem";
-                format = "xfs";
-                mountpoint = "/data2";
-              };
-            };
-          };
-        };
-      };
+      # data2 = {
+      #   type = "disk";
+      #   device = "/dev/sdb";
+      #   content = {
+      #     type = "gpt";
+      #     partitions = {
+      #       data = {
+      #         type = "8300";
+      #         content = {
+      #           type = "filesystem";
+      #           format = "xfs";
+      #           mountpoint = "/data2";
+      #         };
+      #       };
+      #     };
+      #   };
+      # };
 
-      data3 = {
-        type = "disk";
-        device = "/dev/sdc";
-        content = {
-          type = "gpt";
-          partitions = {
-            data = {
-              type = "8300";
-              content = {
-                type = "filesystem";
-                format = "xfs";
-                mountpoint = "/data3";
-              };
-            };
-          };
-        };
-      };
+      # data3 = {
+      #   type = "disk";
+      #   device = "/dev/sdc";
+      #   content = {
+      #     type = "gpt";
+      #     partitions = {
+      #       data = {
+      #         type = "8300";
+      #         content = {
+      #           type = "filesystem";
+      #           format = "xfs";
+      #           mountpoint = "/data3";
+      #         };
+      #       };
+      #     };
+      #   };
+      # };
 
-      parity1 = {
-        type = "disk";
-        device = "/dev/sdd";
-        content = {
-          type = "gpt";
-          partitions = {
-            parity = {
-              type = "8300";
-              content = {
-                type = "filesystem";
-                format = "xfs";
-                mountpoint = "/parity1";
-              };
-            };
-          };
-        };
-      };
+      # parity1 = {
+      #   type = "disk";
+      #   device = "/dev/sdd";
+      #   content = {
+      #     type = "gpt";
+      #     partitions = {
+      #       parity = {
+      #         type = "8300";
+      #         content = {
+      #           type = "filesystem";
+      #           format = "xfs";
+      #           mountpoint = "/parity1";
+      #         };
+      #       };
+      #     };
+      #   };
+      # };
     };
 
     zpool = {
