@@ -8,7 +8,12 @@
         content = {
           type = "gpt";
           partitions = {
-            ESP = {
+            # boot / BIOS
+            bios = {
+              size = "100%";
+              type = "EF02";
+            };
+            efi = {
               type = "EF00";
               size = "1G";
               content = {
