@@ -10,7 +10,7 @@
           partitions = {
             # boot / BIOS
             bios = {
-              size = "100%";
+              size = "1M";
               type = "EF02";
             };
             efi = {
