@@ -24,7 +24,7 @@
           };
           modules = [
             # Base configuration and modules
-            ./modules/zfs-root
+            # ./modules/zfs-root
 
             # Import machine config + secrets
             ./machines/nixos
