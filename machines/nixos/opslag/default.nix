@@ -36,30 +36,30 @@
   #   kernelModules = [ "kvm-intel" ];
   #   zfs.forceImportRoot = true;
   # };
-  zfs-root = {
-    boot = {
-      devNodes = "/dev/disk/by-id/";
-      bootDevices = [ "nvme-Samsung_SSD_970_EVO_500GB_S466NX0K701415F" ];
-      immutable = false;
-      availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" "sr_mod" ];
+  # zfs-root = {
+  #   boot = {
+  #     devNodes = "/dev/disk/by-id/";
+  #     bootDevices = [ "nvme-Samsung_SSD_970_EVO_500GB_S466NX0K701415F" ];
+  #     immutable = false;
+  #     availableKernelModules = [ "uhci_hcd" "ehci_pci" "ahci" "sd_mod" "sr_mod" ];
 
-      removableEfi = true;
-      kernelParams = [
-        "pcie_aspm=force"
-        "consoleblank=60"
-        "acpi_enforce_resources=lax"
-      ];
-      sshUnlock = {
-        enable = false;
-        authorizedKeys = [ ];
-      };
-    };
-    networking = {
-      hostName = "opslag";
-      timeZone = vars.timeZone;
-      hostId = "0730ae51";
-    };
-  };
+  #     removableEfi = true;
+  #     kernelParams = [
+  #       "pcie_aspm=force"
+  #       "consoleblank=60"
+  #       "acpi_enforce_resources=lax"
+  #     ];
+  #     sshUnlock = {
+  #       enable = false;
+  #       authorizedKeys = [ ];
+  #     };
+  #   };
+  #   networking = {
+  #     hostName = "opslag";
+  #     timeZone = vars.timeZone;
+  #     hostId = "0730ae51";
+  #   };
+  # };
   
   imports = [
     ./filesystems

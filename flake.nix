@@ -3,6 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOs/nixpkgs/release-24.05";
+    
+    # disko.url = "github:nix-community/disko";
+    # disko.inputs.nixpkgs.follows = "nixpkgs";
+
     home-manager = {
       url = "github:nix-community/home-manager/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -12,6 +16,7 @@
   outputs = {
     self,
     nixpkgs,
+    # disko,
     home-manager,
     ...
   }@inputs:
@@ -25,6 +30,10 @@
           modules = [
             # Base configuration and modules
             # ./modules/zfs-root
+
+            # Disko
+            # ./disko/opslag.nix
+            # disko.nixosModules.disko
 
             # Import machine config + secrets
             ./machines/nixos

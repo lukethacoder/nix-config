@@ -1,32 +1,59 @@
 # NixOS
 
-> NOTE: this NixOS config is not currently working and is a work in progress. Take anything in this repo with a grain of salt.
+> NOTE: this NixOS config is not currently working and is a work in progress. Take anything in this repo with a grain of salt (for now).
 
 ## Machines
 
 ### Opslag
 
-Main Home Server machine. Will eventually host some sort of RAID/mergerFS/SnapRaid setup as well as a few home server services like Jellyfin, Navidrome, PiHole etc.
+Main Home Server machine. Will eventually host some sort of MergerFS/SnapRaid setup as well as a few services like Jellyfin, Navidrome, PiHole etc.
 
 ## Setup
 
-```
-cd ~/Github
-git clone https://github.com/lukethacoder/.dotfiles
-cd .dotfiles/nixos
+```bash
+mkdir -p /mnt/etc/nixos/
 
-nixos-rebuild switch 
+git clone https://github.com/lukethacoder/nix-config /mnt/etc/nixos/
 ```
 
+> TODO: do we use disko or nah?
+> 
+> Before running, make sure to edit the `disko/` configuration you wish to use.
+
+```bash
+# nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko /mnt/etc/nixos/disko/opslag.nix
 ```
-DISK='/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_500GB_S466NX0K701415F'
 
-curl https://raw.githubusercontent.com/lukethacoder/nix-config/main/disko/default.nix -o /tmp/disko.nix
+Double check your disk has been correctly partitioned.
 
-sed -i "s|to-be-filled-during-installation|$DISK|" /tmp/disko.nix
+<!-- TODO: add GParted screenshot of a "good partition" -->
 
-nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko /tmp/disko.nix
+```bash
+# Generate the flake.lock file
+sudo nix --experimental-features "nix-command flakes" flake lock
+
+# Check the configuration
+nix --experimental-features "nix-command flakes" repl
+
+nix-repl:> :lf .
+# added 9 variables
+
+nix-repl:> outputs.nixosConfigurations.opslag.config.fileSystems
+# { "/" = { ... }; "/boot" = { ... }; }
+
+nix-repl:> outputs.nixosConfigurations.opslag.config.fileSystems."/"
+# { autoFormat = false; autoResize = false; depends = [ ... ]; device = "/dev/disk/by-partlabel/disk-main-root"; encrypted = { ... }; formatOptions = null; fsType = "ext4"; label = null; mountPoint = "/"; neededForBoot = false; noCheck = false; options = [ ... ]; stratis = { ... }; }
 ```
+
+Install NixOS
+
+```bash
+# the '#opslag' is the name of your device you setup in your flake
+sudo nixos-install --root /mnt --flake '/mnt/etc/nixos#opslag'
+# NOTE: You will be prompted to set the root password at this point.
+sudo reboot
+```
+
 
 ## TODO
 

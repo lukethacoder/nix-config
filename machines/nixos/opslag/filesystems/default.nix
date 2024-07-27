@@ -4,22 +4,22 @@
     ./snapraid.nix
   ];
 
-  services.zfs = {
-    autoScrub.enable = true;
-    zed.settings = {
-      ZED_DEBUG_LOG = "/tmp/zed.debug.log";
-      ZED_EMAIL_ADDR = [ "server_announcements@mailbox.org" ];
-      ZED_EMAIL_PROG = "/run/current-system/sw/bin/notify";
-      ZED_EMAIL_OPTS = "-t '@SUBJECT@' -m";
+  # services.zfs = {
+  #   autoScrub.enable = true;
+  #   zed.settings = {
+  #     ZED_DEBUG_LOG = "/tmp/zed.debug.log";
+  #     ZED_EMAIL_ADDR = [ "server_announcements@mailbox.org" ];
+  #     ZED_EMAIL_PROG = "/run/current-system/sw/bin/notify";
+  #     ZED_EMAIL_OPTS = "-t '@SUBJECT@' -m";
 
-      ZED_NOTIFY_INTERVAL_SECS = 3600;
-      ZED_NOTIFY_VERBOSE = true;
+  #     ZED_NOTIFY_INTERVAL_SECS = 3600;
+  #     ZED_NOTIFY_VERBOSE = true;
 
-      ZED_USE_ENCLOSURE_LEDS = true;
-      ZED_SCRUB_AFTER_RESILVER = true;
-    };
-    zed.enableMail = false;
-  };
+  #     ZED_USE_ENCLOSURE_LEDS = true;
+  #     ZED_SCRUB_AFTER_RESILVER = true;
+  #   };
+  #   zed.enableMail = false;
+  # };
 
   programs.fuse.userAllowOther = true;
 
@@ -35,69 +35,108 @@
   # This fixes the weird mergerfs permissions issue
   boot.initrd.systemd.enable = true;
 
+  boot = {
+    initrd = {
+      availableKernelModules = [
+        "xhci_pci"
+        "ahci"
+        "nvme"
+        "usb_storage"
+        "usbhid"
+        "sd_mod" 
+        "sr_mod"
+      ];
+      kernelModules = [ ];
+    };
+    kernelModules = [ "kvm-intel" ];
+    extraModulePackages = [ ];
+    
+    loader = {
+      efi = {
+        canTouchEfiVariables = (if cfg.removableEfi then false else true);
+        efiSysMountPoint = "/boot/esp";
+      };
+      generationsDir.copyKernels = true;
+      # grub = {
+      #   enable = true;
+      #   #devices = (map (diskName: cfg.devNodes + diskName) cfg.bootDevices);
+      #   device = "nodev";
+      #   efiInstallAsRemovable = cfg.removableEfi;
+      #   copyKernels = true;
+      #   efiSupport = true;
+      #   zfsSupport = true;
+      #   extraInstallCommands = (toString (map (diskName: ''
+      #     set -x
+      #     ${pkgs.coreutils-full}/bin/cp -r ${config.boot.loader.efi.efiSysMountPoint}/EFI /boot/esp
+      #     set +x
+      #   '') (tail cfg.bootDevices)));
+      # };
+    };
+  };
+
+  # boot.initrd.systemd.services.rollback = {
+  #   description = "Rollback ZFS datasets to a pristine state";
+  #   wantedBy = [
+  #     "initrd.target"
+  #   ]; 
+  #   after = [
+  #     "zfs-import-zroot.service"
+  #   ];
+  #   before = [ 
+  #     "sysroot.mount"
+  #   ];
+  #   path = with pkgs; [
+  #     zfs
+  #   ];
+  #   unitConfig.DefaultDependencies = "no";
+  #   serviceConfig.Type = "oneshot";
+  #   script = ''
+  #     zfs rollback -r nixos/empty@start
+  #   '';
+  # };
+  
   fileSystems."/" = lib.mkForce {
-    device = "rpool/nixos/empty";
+    device = "nixos/empty";
     fsType = "zfs";
-  };
-
-  boot.initrd.systemd.services.rollback = {
-    description = "Rollback ZFS datasets to a pristine state";
-    wantedBy = [
-      "initrd.target"
-    ]; 
-    after = [
-      "zfs-import-zroot.service"
-    ];
-    before = [ 
-      "sysroot.mount"
-    ];
-    path = with pkgs; [
-      zfs
-    ];
-    unitConfig.DefaultDependencies = "no";
-    serviceConfig.Type = "oneshot";
-    script = ''
-      zfs rollback -r rpool/nixos/empty@start
-    '';
-  };
-
-
-  fileSystems."/nix" = {
-    device = "rpool/nixos/nix";
-    fsType = "zfs";
-    neededForBoot = true;
-  };
-
-  fileSystems."/etc/nixos" = {
-    device = "rpool/nixos/config";
-    fsType = "zfs";
-    neededForBoot = true;
   };
 
   fileSystems."/boot" = {
-    device = "bpool/nixos/root";
-    fsType = "zfs";
+    device = "/dev/disk/by-partlabel/disk-main-root";
+    fsType = "vfat";
   };
 
+
+  # fileSystems."/nix" = {
+  #   device = "nixos/nix";
+  #   fsType = "zfs";
+  #   neededForBoot = true;
+  # };
+
+  # fileSystems."/etc/nixos" = {
+  #   device = "nixos/config";
+  #   fsType = "zfs";
+  #   neededForBoot = true;
+  # };
+
   fileSystems."/home" = {
-    device = "rpool/nixos/home";
+    device = "nixos/home";
     fsType = "zfs";
     neededForBoot = true;
   };
 
   fileSystems."/persist" = {
-    device = "rpool/nixos/persist";
+    device = "nixos/persist";
     fsType = "zfs";
     neededForBoot = true;
   };
 
   fileSystems."/var/log" = {
-    device = "rpool/nixos/var/log";
+    device = "nixos/var/log";
     fsType = "zfs";
   };
 
   fileSystems."/var/lib/containers" = {
-    device = "/dev/zvol/rpool/docker";
+    device = "/dev/zvol/docker";
     fsType = "ext4";
   };
 
