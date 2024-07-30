@@ -24,10 +24,12 @@
       nixosConfigurations = {
         opslag = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          specialArgs = {
-            vars = import ./machines/nixos/vars.nix;
-          };
+          # specialArgs = {
+          #   vars = import ./machines/nixos/vars.nix;
+          # };
           modules = [
+            ./configuration.nix
+            ./hardware-configuration.nix
             # Base configuration and modules
             # ./modules/zfs-root
 
@@ -36,20 +38,20 @@
             # disko.nixosModules.disko
 
             # Import machine config + secrets
-            ./machines/nixos
-            ./machines/nixos/opslag
+            # ./machines/nixos
+            # ./machines/nixos/opslag
 
             # Users
-            ./users/luke
+            # ./users/luke
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = false;
               # home-manager.extraSpecialArgs = { inherit inputs };
-              home-manager.users.luke.imports = [
-                # agenix.homeManagerModules.default
-                # nix-index-database.hmModules.nix-index
-                ./users/luke/dots.nix
-              ];
+              # home-manager.users.luke.imports = [
+              #   # agenix.homeManagerModules.default
+              #   # nix-index-database.hmModules.nix-index
+              #   ./users/luke/dots.nix
+              # ];
               home-manager.backupFileExtension = "bak";
             }
 
