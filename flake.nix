@@ -43,19 +43,17 @@
             # ./machines/nixos/opslag
 
             # Users
-            # ./users/luke
+            ./users/luke
             home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-
-              home-manager.users.luke = import ./home.nix;
               # home-manager.extraSpecialArgs = { inherit inputs };
-              # home-manager.users.luke.imports = [
-              #   # agenix.homeManagerModules.default
-              #   # nix-index-database.hmModules.nix-index
-              #   ./users/luke/dots.nix
-              # ];
+              home-manager.users.luke.imports = [
+                # agenix.homeManagerModules.default
+                # nix-index-database.hmModules.nix-index
+                ./users/luke/dots.nix
+              ];
               home-manager.backupFileExtension = "bak";
             }
 

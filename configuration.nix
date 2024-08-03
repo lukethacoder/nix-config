@@ -83,17 +83,6 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.luke = {
-    isNormalUser = true;
-    description = "luke";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      _1password
-      _1password-gui
-    ];
-  };
-
   fonts = {
     packages = with pkgs; [
       fira-code-nerdfont
@@ -164,12 +153,6 @@
     yelp # Help Viewer
   ]);
 
-  programs._1password.enable = true;
-  programs._1password-gui = {
-    enable = true;
-    polkitPolicyOwners = [ "luke" ];
-  };
-
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -196,5 +179,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.05"; # Did you read the comment?
-
 }
