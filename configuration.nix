@@ -44,8 +44,13 @@
     xkbVariant = "";
 
     # Enable the GNOME Desktop Environment.
-    displayManager.gdm.enable = true;
     desktopManager.gnome.enable = true;
+    displayManager = {
+      gdm = {
+        enable = true;
+        autoSuspend = false;
+      };
+    };
 
     # disable xterm
     excludePackages = [ pkgs.xterm ];
