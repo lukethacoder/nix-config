@@ -37,17 +37,18 @@
     LC_TIME = "en_AU.UTF-8";
   };
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
-  # Configure keymap in X11
+  # Enable the X11 windowing system & configure keymap in X11
   services.xserver = {
+    enable = true;
     layout = "au";
     xkbVariant = "";
+
+    # Enable the GNOME Desktop Environment.
+    displayManager.gdm.enable = true;
+    desktopManager.gnome.enable = true;
+
+    # disable xterm
+    excludePackages = [ pkgs.xterm ];
   };
 
   # Enable CUPS to print documents.
@@ -83,8 +84,44 @@
     ];
   };
 
+  fonts = {
+    packages = with pkgs; [
+      fira-code-nerdfont
+      (nerdfonts.override { fonts = [ "FiraCode" ]; })
+    ];
+
+    fontconfig = {
+      defaultFonts = {
+        monospace = [ "FiraCode Nerd Font" ];
+      };
+    };
+  };
+
   # Install firefox.
   programs.firefox.enable = true;
+
+  # Starship.rs shell
+  programs.starship = {
+    enable = true;
+    settings = {
+      add_newline = true;
+
+      directory = {
+        truncation_length = 5;
+      };
+      
+      git_status = {
+        conflicted = "🏳";
+        # up_to_date = "✓";
+        untracked = "🤔";
+        stashed = "📦";
+        modified = "📝";
+        staged = "[++\($count\)](green)";
+        renamed = "🏷️";
+        deleted = "🗑";
+      };
+    };
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -94,7 +131,28 @@
   environment.systemPackages = with pkgs; [
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
+    starship
   ];
+
+  # exclude default GNOME Packages
+  environment.gnome.excludePackages = (with pkgs; [
+    gnome-photos
+    gnome-tour
+    # gedit # Text Editor
+    gnome-text-editor # Text Editor
+  ]) ++ (with pkgs.gnome; [
+    gnome-calendar
+    gnome-contacts
+    gnome-music
+    gnome-weather
+    cheese # Webcam / Camera App
+    epiphany # Web Browser
+    evince # Document Viewer
+    geary # Email Client
+    seahorse # Password Manager
+    totem # Video Player
+    yelp # Help Viewer
+  ]);
 
   programs._1password.enable = true;
   programs._1password-gui = {

@@ -56,7 +56,7 @@
               #   # nix-index-database.hmModules.nix-index
               #   ./users/luke/dots.nix
               # ];
-            #  home-manager.backupFileExtension = "bak";
+              home-manager.backupFileExtension = "bak";
             }
 
           ];
