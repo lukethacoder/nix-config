@@ -24,7 +24,7 @@ in {
       type = types.str;
       default = "luke@example.com";
     };
-    smtpUsername = mkOption {
+    smtpPassword = mkOption {
       description = "Path to the secret containing SMTP password";
       type = types.str;
     };
