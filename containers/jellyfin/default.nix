@@ -12,7 +12,7 @@ in {
       jellyfin = {
         image = "lscr.io/linuxserver/jellyfin";
         autoStart = true;
-        extraOptions [
+        extraOptions = [
           "--device=/dev/dri:/dev/dri"
           # TODO: add traefik and homepage config
         ];
@@ -27,7 +27,7 @@ in {
           UMASK = "002";
           GUID = "993";
         };
-      }
-    }
+      };
+    };
   };
 }
