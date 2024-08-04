@@ -33,6 +33,7 @@
             ./modules/fonts
             ./modules/gnome
             ./modules/podman
+            ./modules/email
 
             # Disko
             # ./disko/opslag.nix
@@ -43,6 +44,8 @@
             ./machines/nixos/opslag
 
             # Services and applications
+            ./containers/homepage
+            ./containers/traefik
             ./containers/jellyfin
 
             # Users

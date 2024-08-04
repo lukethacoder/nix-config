@@ -3,7 +3,7 @@
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
-    # extraPackages = [];
+    extraPackages = [ pkgs.zfs ];
     defaultNetwork.settings = {
       dns_enabled = true;
     };

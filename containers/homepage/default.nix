@@ -64,7 +64,7 @@ in {
           "/var/run/podman/podman.sock:/var/run/docker.sock:ro"
           # "${config.age.secrets.sonarrApiKey.path}:/app/config/sonarr.key"
           # "${config.age.secrets.radarrApiKey.path}:/app/config/radarr.key"
-          "${config.age.secrets.jellyfinApiKey.path}:/app/config/jellyfin.key"
+          # "${config.age.secrets.jellyfinApiKey.path}:/app/config/jellyfin.key"
         ];
         environment = {
           TZ = vars.timeZone;

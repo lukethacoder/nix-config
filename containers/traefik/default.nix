@@ -52,9 +52,9 @@ in
           "443:443"
           "80:80"
         ];
-        environmentFiles = [
-          config.age.secrets.cloudflareDnsApiCredentials.path
-        ];
+        # environmentFiles = [
+        #   config.age.secrets.cloudflareDnsApiCredentials.path
+        # ];
         volumes = [
           "/var/run/podman/podman.sock:/var/run/docker.sock:ro"
           "${vars.serviceConfigRoot}/traefik/acme.json:/acme.json"
