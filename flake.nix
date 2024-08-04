@@ -41,6 +41,9 @@
             ./machines/nixos
             ./machines/nixos/opslag
 
+            # Services and applications
+            ./containers/jellyfin
+
             # Users
             ./users/luke
             home-manager.nixosModules.home-manager
