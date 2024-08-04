@@ -32,6 +32,7 @@
             # Base configuration and modules
             ./modules/fonts
             ./modules/gnome
+            ./modules/podman
 
             # Disko
             # ./disko/opslag.nix
