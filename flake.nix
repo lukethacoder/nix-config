@@ -24,13 +24,14 @@
       nixosConfigurations = {
         opslag = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          # specialArgs = {
-          #   vars = import ./machines/nixos/vars.nix;
-          # };
+          specialArgs = {
+            inherit inputs;
+            vars = import ./machines/nixos/vars.nix;
+          };
           modules = [
             # Base configuration and modules
-            # ./modules/fonts
-            # ./modules/gnome
+            ./modules/fonts
+            ./modules/gnome
 
             # Disko
             # ./disko/opslag.nix
@@ -46,7 +47,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              # home-manager.extraSpecialArgs = { inherit inputs };
+              home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.users.luke.imports = [
                 # agenix.homeManagerModules.default
                 # nix-index-database.hmModules.nix-index
