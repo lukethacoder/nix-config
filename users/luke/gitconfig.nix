@@ -8,8 +8,11 @@
     aliases = {
       s = "status";
       p = "push";
+      pl = "pull";
       cm = "commit -m";
       a = "add";
+      f = "fetch";
+      c = "checkout";
     };
 
     extraConfig = {
