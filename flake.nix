@@ -28,19 +28,17 @@
           #   vars = import ./machines/nixos/vars.nix;
           # };
           modules = [
-            ./configuration.nix
-            ./hardware-configuration.nix
-
             # Base configuration and modules
-            # ./modules/zfs-root
+            # ./modules/fonts
+            # ./modules/gnome
 
             # Disko
             # ./disko/opslag.nix
             # disko.nixosModules.disko
 
             # Import machine config + secrets
-            # ./machines/nixos
-            # ./machines/nixos/opslag
+            ./machines/nixos
+            ./machines/nixos/opslag
 
             # Users
             ./users/luke
