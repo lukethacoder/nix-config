@@ -5,7 +5,7 @@
   users.users.luke = {
     isNormalUser = true;
     description = "luke";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "podman" ];
     packages = with pkgs; [];
   };
 

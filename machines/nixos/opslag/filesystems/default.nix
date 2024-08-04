@@ -23,7 +23,7 @@
     fsType = "vfat";
     options = [ "fmask=0022" "dmask=0022" ];
   };
-
+  
   # Data Disks
   fileSystems."/mnt/data1" = {
     device = "/dev/disk/by-partlabel/disk-data1-data";

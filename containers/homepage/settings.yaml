@@ -1,0 +1,8 @@
+---
+headerStyle: clean
+statusStyle: dot
+hideVersion: true
+layout:
+  - Arr:
+  - Media:
+  - Services:
