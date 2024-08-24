@@ -2,10 +2,14 @@
 {
   nix.settings.trusted-users = [ "luke" ];
 
+  users.groups.share = {
+    gid = 993;
+  };
+
   users.users.luke = {
     isNormalUser = true;
     description = "luke";
-    extraGroups = [ "networkmanager" "wheel" "podman" ];
+    extraGroups = [ "share" "networkmanager" "wheel" "podman" ];
     packages = with pkgs; [];
   };
 
