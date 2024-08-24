@@ -33,8 +33,6 @@
           };
           modules = [
             # Base configuration and modules
-            ./secrets
-            agenix.nixosModules.default
             ./modules/fonts
             ./modules/gnome
             ./modules/podman
@@ -47,6 +45,8 @@
             # Import machine config + secrets
             ./machines/nixos
             ./machines/nixos/opslag
+            ./secrets
+            agenix.nixosModules.default
 
             # Services and applications
             ./containers/homepage
@@ -67,11 +67,11 @@
               ];
               home-manager.backupFileExtension = "bak";
             }
-            {
-              environment.systemPackages = [
-                agenix.packages.x86_64-linux.default
-              ];
-            }
+            # {
+            #   environment.systemPackages = [
+            #     agenix.packages.x86_64-linux.default
+            #   ];
+            # }
           ];
         };
       };
