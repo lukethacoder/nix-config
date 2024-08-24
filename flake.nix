@@ -33,6 +33,7 @@
           };
           modules = [
             # Base configuration and modules
+            ./secrets
             agenix.nixosModules.default
             ./modules/fonts
             ./modules/gnome
@@ -60,13 +61,17 @@
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.users.luke.imports = [
-                # agenix.homeManagerModules.default
+                agenix.homeManagerModules.default
                 # nix-index-database.hmModules.nix-index
                 ./users/luke/dots.nix
               ];
               home-manager.backupFileExtension = "bak";
             }
-
+            {
+              environment.systemPackages = [
+                agenix.packages.x86_64-linux.default
+              ];
+            }
           ];
         };
       };
