@@ -12,7 +12,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    agenix.url = "github:ryantm/agenix";
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Load agenix secrets from private repository
+    secrets = {
+      url = "git+file:///home/luke/Github/nix-private";
+      flake = false;
+      # submodules = true;
+    };
   };
 
   outputs = {
@@ -21,6 +31,7 @@
     # disko,
     home-manager,
     agenix,
+    secrets,
     ...
   }@inputs:
     {
@@ -45,7 +56,8 @@
             # Import machine config + secrets
             ./machines/nixos
             ./machines/nixos/opslag
-            ./secrets
+            # ./secrets
+            secrets
             agenix.nixosModules.default
 
             # Services and applications
@@ -67,11 +79,6 @@
               ];
               home-manager.backupFileExtension = "bak";
             }
-            # {
-            #   environment.systemPackages = [
-            #     agenix.packages.x86_64-linux.default
-            #   ];
-            # }
           ];
         };
       };
