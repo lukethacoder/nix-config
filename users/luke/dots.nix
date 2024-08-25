@@ -21,9 +21,11 @@
 
   programs.ssh = {
     enable = true;
+    # Host github.com
+    #   IdentityAgent ~/.ssh/id_ed25519
     extraConfig = ''
-      Host *
-          IdentityAgent ~/.1password/agent.sock
+    Host *
+      IdentityAgent ~/.1password/agent.sock
     '';
   };
 
