@@ -12,16 +12,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    agenix = {
-      url = "github:ryantm/agenix";
+    # agenix = {
+    #   url = "github:ryantm/agenix";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
+
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Load agenix secrets from private repository
+    # Load secrets from private repository
     secrets = {
-      url = "git+file:///home/luke/Github/nix-private";
+      url = "git+ssh://git@github.com/lukethacoder/nix-private.git?ref=main&shallow=1";
       flake = false;
-      # submodules = true;
     };
   };
 
@@ -30,8 +34,9 @@
     nixpkgs,
     # disko,
     home-manager,
-    agenix,
-    secrets,
+    # agenix,
+    sops-nix,
+    # secrets,
     ...
   }@inputs:
     {
@@ -56,9 +61,11 @@
             # Import machine config + secrets
             ./machines/nixos
             ./machines/nixos/opslag
+            sops-nix.nixosModules.sops
             # ./secrets
-            secrets
-            agenix.nixosModules.default
+            # inputs.secrets
+            # builtins.toString secrets
+            # agenix.nixosModules.default
 
             # Services and applications
             ./containers/homepage
@@ -73,7 +80,7 @@
               home-manager.useUserPackages = true;
               home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.users.luke.imports = [
-                agenix.homeManagerModules.default
+                # agenix.homeManagerModules.default
                 # nix-index-database.hmModules.nix-index
                 ./users/luke/dots.nix
               ];
