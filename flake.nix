@@ -35,8 +35,7 @@
     # disko,
     home-manager,
     # agenix,
-    sops-nix,
-    nix-secrets,
+    # nix-secrets,
     ...
   }@inputs:
     {
@@ -49,7 +48,6 @@
           };
           modules = [
             # Base configuration and modules
-            ./modules/sops
             ./modules/fonts
             ./modules/gnome
             ./modules/podman
@@ -62,8 +60,7 @@
             # Import machine config + secrets
             ./machines/nixos
             ./machines/nixos/opslag
-            sops-nix.nixosModules.sops
-            nix-secrets
+            # nix-secrets
             # ./secrets
             # inputs.secrets
             # builtins.toString secrets
@@ -88,6 +85,8 @@
               ];
               home-manager.backupFileExtension = "bak";
             }
+
+            ./modules/sops
           ];
         };
       };
