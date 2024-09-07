@@ -21,6 +21,24 @@
         "type": "github"
       }
     },
+    "nix-secrets": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1724598874,
+        "narHash": "sha256-DkC3N0Av+d0pz3kCo4+UNFmYSFlaPbIaBeRlKydI4R0=",
+        "ref": "main",
+        "rev": "eda2f37c80690b06f112989de1ebbbc9f82f6a42",
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@github.com/lukethacoder/nix-private.git"
+      },
+      "original": {
+        "ref": "main",
+        "shallow": true,
+        "type": "git",
+        "url": "ssh://git@github.com/lukethacoder/nix-private.git"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1724531977,
@@ -56,27 +74,9 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
+        "nix-secrets": "nix-secrets",
         "nixpkgs": "nixpkgs",
-        "secrets": "secrets",
         "sops-nix": "sops-nix"
-      }
-    },
-    "secrets": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1724598874,
-        "narHash": "sha256-DkC3N0Av+d0pz3kCo4+UNFmYSFlaPbIaBeRlKydI4R0=",
-        "ref": "main",
-        "rev": "eda2f37c80690b06f112989de1ebbbc9f82f6a42",
-        "shallow": true,
-        "type": "git",
-        "url": "ssh://git@github.com/lukethacoder/nix-private.git"
-      },
-      "original": {
-        "ref": "main",
-        "shallow": true,
-        "type": "git",
-        "url": "ssh://git@github.com/lukethacoder/nix-private.git"
       }
     },
     "sops-nix": {

@@ -23,7 +23,7 @@
     };
 
     # Load secrets from private repository
-    secrets = {
+    nix-secrets = {
       url = "git+ssh://git@github.com/lukethacoder/nix-private.git?ref=main&shallow=1";
       flake = false;
     };
@@ -36,7 +36,7 @@
     home-manager,
     # agenix,
     sops-nix,
-    # secrets,
+    nix-secrets,
     ...
   }@inputs:
     {
@@ -49,6 +49,7 @@
           };
           modules = [
             # Base configuration and modules
+            ./modules/sops
             ./modules/fonts
             ./modules/gnome
             ./modules/podman
@@ -62,6 +63,7 @@
             ./machines/nixos
             ./machines/nixos/opslag
             sops-nix.nixosModules.sops
+            nix-secrets
             # ./secrets
             # inputs.secrets
             # builtins.toString secrets
