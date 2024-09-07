@@ -20,10 +20,6 @@ in
     };
   };
 
-  environment.etc."sops-test-debug-file".text = ''
-    test sops ${config.sops.secrets."encrypt".path}
-  '';
-
   system.activationScripts.sopsSetAgeKeyOwnership = 
     let
       ageFolder = "${homeDirectory}/.config/sops/age";
