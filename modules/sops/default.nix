@@ -17,7 +17,13 @@ in
 
     secrets = {
       time_zone = {};
+      domain_name = {};
+      email_address = {};
       "jellyfin/api_key" = {};
+    };
+
+    templates = {
+      "domainName".content = ''${config.sops.placeholder.domain_name}'';
     };
   };
 

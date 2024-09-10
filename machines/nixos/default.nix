@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ inputs, config, lib, pkgs, ... }:
 {
   # DO NOT MANUALLY UPDATE THIS VALUE
   system.stateVersion = "24.05";
@@ -58,5 +58,9 @@
 
   environment.systemPackages = with pkgs; [
     starship
+    neofetch
+    cinnamon.nemo-with-extensions
+    sops
+    age
   ];
 }
