@@ -9,6 +9,7 @@
       "editor.tabSize" = 2;
       "workbench.colorTheme" = "One Dark Pro";
       "workbench.iconTheme" = "material-icon-theme";
+      "window.zoomLevel" = -1;
     };
     extensions = with pkgs.vscode-extensions; [
       wakatime.vscode-wakatime
