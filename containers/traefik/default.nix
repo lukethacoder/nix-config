@@ -22,7 +22,7 @@ in
           "--entrypoints.web.address=:80"
           "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
           "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
-          "--certificatesresolvers.letsencrypt.acme.email=${config.email.toAddress}"
+          "--certificatesresolvers.letsencrypt.acme.email=${builtins.readFile config.sops.secrets.email_address.path}"
           # HTTP
           "--entrypoints.web.address=:80"
           "--entrypoints.web.http.redirections.entrypoint.to=websecure"
@@ -31,19 +31,19 @@ in
           # HTTPS
           "--entrypoints.websecure.http.tls=true"
           "--entrypoints.websecure.http.tls.certResolver=letsencrypt"
-          "--entrypoints.websecure.http.tls.domains[0].main=${vars.domainName}"
-          "--entrypoints.websecure.http.tls.domains[0].sans=*.${vars.domainName}"
+          "--entrypoints.websecure.http.tls.domains[0].main=${builtins.readFile config.sops.secrets.domain_name.path}"
+          "--entrypoints.websecure.http.tls.domains[0].sans=*.${builtins.readFile config.sops.secrets.domain_name.path}"
 
         ];
         extraOptions = [
           # Proxying Traefik itself
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.traefik.rule=Host(`proxy.${vars.domainName}`)"
+          "-l=traefik.http.routers.traefik.rule=Host(`proxy.${builtins.readFile config.sops.secrets.domain_name.path}`)"
           "-l=traefik.http.services.traefik.loadbalancer.server.port=8080"
           "-l=homepage.group=Services"
           "-l=homepage.name=Traefik"
           "-l=homepage.icon=traefik.svg"
-          "-l=homepage.href=https://proxy.${vars.domainName}"
+          "-l=homepage.href=https://proxy.${builtins.readFile config.sops.secrets.domain_name.path}"
           "-l=homepage.description=Reverse proxy"
           "-l=homepage.widget.type=traefik"
           "-l=homepage.widget.url=http://traefik:8080"
