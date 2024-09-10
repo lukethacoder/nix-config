@@ -29,6 +29,12 @@
     '';
   };
 
+  dconf.settings = {
+    "org/gnome/settings-daemon/plugins/power" = {
+      sleep-inactive-ac-type = "nothing";
+    };
+  };
+
   programs.gpg.enable = true;
   services.gpg-agent = {
     enable = true;
