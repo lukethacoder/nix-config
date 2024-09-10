@@ -24,10 +24,10 @@
     "nix-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1725700616,
-        "narHash": "sha256-Iy5Ryh4mcK+eD3nHRqAIBKYQYFHEpxC7BINdoJ9yT8o=",
+        "lastModified": 1725970758,
+        "narHash": "sha256-qcmLJCk0L7XgiDiQ73VNigCSjFZEWBaXUEPRWCnoCOI=",
         "ref": "main",
-        "rev": "22716d62f63e36ad1d4a89c649888ad068fce1b9",
+        "rev": "222da622d694827b0770c85df86f84b901a0d3c5",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/lukethacoder/nix-private.git"

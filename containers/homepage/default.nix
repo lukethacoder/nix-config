@@ -1,4 +1,4 @@
-{ config, vars, pkgs, ... }:
+{ config, inputs, vars, pkgs, ... }:
 let
   directories = [
     "${vars.serviceConfigRoot}/homepage"
@@ -50,9 +50,10 @@ in {
         autoStart = true;
         extraOptions = [
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.home.rule=Host(`${vars.domainName}`)"
+          # "-l=traefik.http.routers.home.rule=Host(`${config.age.secrets.domainName.path}`)"
           "-l=traefik.http.services.home.loadbalancer.server.port=3000"
         ];
+        ports = [ "3000:3000" ];
         volumes = [
           "${vars.serviceConfigRoot}/homepage/config:/app/config"
           "${homepageSettings.docker}:/app/config/docker.yaml"
@@ -64,10 +65,10 @@ in {
           "/var/run/podman/podman.sock:/var/run/docker.sock:ro"
           # "${config.age.secrets.sonarrApiKey.path}:/app/config/sonarr.key"
           # "${config.age.secrets.radarrApiKey.path}:/app/config/radarr.key"
-          # "${config.age.secrets.jellyfinApiKey.path}:/app/config/jellyfin.key"
+          "${config.sops.secrets."jellyfin/api_key".path}:/app/config/jellyfin.key"
         ];
         environment = {
-          TZ = vars.timeZone;
+          TZ = "${config.sops.secrets.time_zone.path}";
           # HOMEPAGE_FILE_SONARR_KEY = "/app/config/sonarr.key";
           # HOMEPAGE_FILE_RADARR_KEY = "/app/config/radarr.key";
           HOMEPAGE_FILE_JELLYFIN_KEY = "/app/config/jellyfin.key";

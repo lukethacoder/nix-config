@@ -16,7 +16,8 @@ in
     };
 
     secrets = {
-      "encrypt" = { };
+      time_zone = {};
+      "jellyfin/api_key" = {};
     };
   };
 

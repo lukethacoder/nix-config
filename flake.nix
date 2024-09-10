@@ -12,11 +12,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # agenix = {
-    #   url = "github:ryantm/agenix";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -34,8 +29,6 @@
     nixpkgs,
     # disko,
     home-manager,
-    # agenix,
-    # nix-secrets,
     ...
   }@inputs:
     {
@@ -48,6 +41,7 @@
           };
           modules = [
             # Base configuration and modules
+            ./modules/sops
             ./modules/fonts
             ./modules/gnome
             ./modules/podman
@@ -85,8 +79,6 @@
               ];
               home-manager.backupFileExtension = "bak";
             }
-
-            ./modules/sops
           ];
         };
       };
