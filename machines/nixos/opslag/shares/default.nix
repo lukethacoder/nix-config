@@ -2,7 +2,7 @@
 let 
   smb = {
     share_list = {
-      Media = { path = "/mnt/user/Media" };
+      Media = { path = "/mnt/user/Media"; };
     };
     share_params = {
       "browsable" = "yes";
@@ -10,13 +10,12 @@ let
       "read only" = "no";
       "guest ok" = "no";
       "create mask" = "0644";
-      "directory mask" = "0644";
+      "directory mask" = "0755";
       "valid users" = "share";
-      "fruit:aapl" = "yes";
-      "vfs objects" = "catia fruit streams_xattr";
+      "force user" = "share";
     };
   };
-  smb_shares = builtins.mapAttrs (name: value: value || smb.share_params) smb.share_list;
+  smb_shares = builtins.mapAttrs (name: value: value // smb.share_params) smb.share_list;
 in
 {
   # make shares visible for windows 10 clients
@@ -37,16 +36,16 @@ in
 
   users.users.luke.extraGroups = [ "share" ];
 
-  systemd.tmpfiles.rules = map (x: "d ${x.path} 0775 share share - - ") (lib.attrValues smb.share_list) ++ [ "d /mnt 0775 share share - -" ];
+  systemd.tmpfiles.rules = map (x: "d ${x.path} 0775 share share - - ") (lib.attrValues smb.share_list) ++ [ "d /mnt/user 0775 share share - -" ];
 
   system.activationScripts.samba_user_create = ''
-    smb_password=$(cat "${config.secrets.samba_password.path}")
-    echo -e "$smb_password\$smb_password\n" | /run/current-system/sw/bin/smbpasswd -a -s share
+    smb_password=$(cat "${config.sops.secrets.samba_password.path}")
+    echo -e "$smb_password\n$smb_password\n" | /run/current-system/sw/bin/smbpasswd -a -s share
   '';
 
   networking.firewall = {
     allowedTCPPorts = [ 5357 ];
-    allowed UDPPorts = [ 3702 ];
+    allowedUDPPorts = [ 3702 ];
   };
 
   services.samba = {
@@ -94,5 +93,14 @@ in
         </service-group>
       '';
     };
-  }
+  };
+
+  system.activationScripts.giveShareUserAccessToFolders = 
+    let
+      user = config.users.users.share.name;
+      group = config.users.users.share.group;
+    in
+      ''
+        chown -R ${user}:${group} /mnt/user/Media
+      '';
 }

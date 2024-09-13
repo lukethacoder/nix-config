@@ -63,4 +63,14 @@
   };
 
   swapDevices = [ ];
+
+  # Give user access to the MergerFS mount
+  system.activationScripts.giveUserAccessToDataDisk = 
+    let
+      user = config.users.users.luke.name;
+      group = config.users.users.luke.group;
+    in
+      ''
+        chown -R ${user}:${group} ${vars.mainArray}
+      '';
 }
