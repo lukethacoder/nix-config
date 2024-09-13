@@ -65,6 +65,7 @@
             ./containers/traefik
             ./containers/jellyfin
             ./containers/gonic
+            ./containers/lms
 
             # Users
             ./users/luke
