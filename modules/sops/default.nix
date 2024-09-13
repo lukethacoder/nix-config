@@ -20,6 +20,7 @@ in
       domain_name = {};
       email_address = {};
       "jellyfin/api_key" = {};
+      samba_password = {};
     };
 
     templates = {
