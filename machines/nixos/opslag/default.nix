@@ -2,6 +2,7 @@
 {
   imports = [
     ./filesystems
+    ./shares
   ];
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
