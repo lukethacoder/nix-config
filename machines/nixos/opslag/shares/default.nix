@@ -95,6 +95,7 @@ in
     };
   };
 
+  # not ideal, but doesn't seem to let windows have write access without 0777 :(
   system.activationScripts.giveShareUserAccessToFolders = 
     let
       user = config.users.users.share.name;
@@ -102,5 +103,6 @@ in
     in
       ''
         chown -R ${user}:${group} /mnt/user/Media
+        chmod -R 0777 /mnt/user/Media
       '';
 }
