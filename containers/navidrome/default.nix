@@ -28,29 +28,25 @@ in {
           ND_SCANSCHEDULE = "1h";
           ND_LOGLEVEL = "info";
           ND_SESSIONTIMEOUT = "24h";
-          ND_BASEURL = "";
-          # PUID = "994";
-          # UMASK = "002";
-          # GUID = "993";
+          ND_BASEURL = "http://navidrome.${builtins.readFile config.sops.secrets.domain_name.path}";
+          ND_LASTFM_ENABLED = "true";
+          ND_LASTFM_APIKEY = config.sops.secrets."lastfm/api_key".path;
+          ND_LASTFM_SECRET = config.sops.secrets."lastfm/api_secret".path;
         };
         extraOptions = [
-          # "--network=podman"
-        #   # "--device=/dev/snd:/dev/snd"
-        #   # "-multi-value-genre=multi"
-        #   # "-multi-value-artist=multi"
-        #   # "-multi-value-album-artist=multi"
           "-l=traefik.enable=true"
           "-l=traefik.http.routers.navidrome.rule=Host(`navidrome.${builtins.readFile config.sops.secrets.domain_name.path}`)"
           "-l=traefik.http.services.navidrome.loadbalancer.server.port=4533"
-        #   # "-l=homepage.group=Media"
-        #   # "-l=homepage.name=Gonic"
-        #   # "-l=homepage.icon=gonic.svg"
-        #   # "-l=homepage.href=https://gonic.${builtins.readFile config.sops.secrets.domain_name.path}"
-        #   # "-l=homepage.description=Media player"
-        #   # "-l=homepage.widget.type=gonic"
-        #   # "-l=homepage.widget.key={{HOMEPAGE_FILE_JELLYFIN_KEY}}"
-        #   # "-l=homepage.widget.url=http://gonic:4747"
-        #   # "-l=homepage.widget.enableBlocks=true"
+          "-l=homepage.group=Media"
+          "-l=homepage.name=Navidrome"
+          "-l=homepage.icon=navidrome.svg"
+          "-l=homepage.href=https://navidrome.${builtins.readFile config.sops.secrets.domain_name.path}"
+          "-l=homepage.description=Media player"
+          "-l=homepage.widget.type=navidrome"
+          "-l=homepage.widget.user={{HOMEPAGE_FILE_NAVIDROME_USERNAME}}"
+          "-l=homepage.widget.token={{HOMEPAGE_FILE_NAVIDROME_TOKEN}}"
+          "-l=homepage.widget.salt={{HOMEPAGE_FILE_NAVIDROME_SALT}}"
+          "-l=homepage.widget.url=https://navidrome.${builtins.readFile config.sops.secrets.domain_name.path}"
         ];
       };
     };

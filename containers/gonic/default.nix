@@ -42,15 +42,6 @@ in {
           "-l=traefik.enable=true"
           "-l=traefik.http.routers.gonic.rule=Host(`gonic.${builtins.readFile config.sops.secrets.domain_name.path}`)"
           "-l=traefik.http.services.gonic.loadbalancer.server.port=4747"
-          # "-l=homepage.group=Media"
-          # "-l=homepage.name=Gonic"
-          # "-l=homepage.icon=gonic.svg"
-          # "-l=homepage.href=https://gonic.${builtins.readFile config.sops.secrets.domain_name.path}"
-          # "-l=homepage.description=Media player"
-          # "-l=homepage.widget.type=gonic"
-          # "-l=homepage.widget.key={{HOMEPAGE_FILE_JELLYFIN_KEY}}"
-          # "-l=homepage.widget.url=http://gonic:4747"
-          # "-l=homepage.widget.enableBlocks=true"
         ];
       };
     };

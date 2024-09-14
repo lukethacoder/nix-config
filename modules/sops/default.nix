@@ -20,6 +20,11 @@ in
       domain_name = {};
       email_address = {};
       "jellyfin/api_key" = {};
+      "navidrome/username" = {};
+      "navidrome/token" = {};
+      "navidrome/salt" = {};
+      "lastfm/api_key" = {};
+      "lastfm/api_secret" = {};
       samba_password = {};
     };
 

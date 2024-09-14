@@ -66,12 +66,18 @@ in {
           # "${config.age.secrets.sonarrApiKey.path}:/app/config/sonarr.key"
           # "${config.age.secrets.radarrApiKey.path}:/app/config/radarr.key"
           "${config.sops.secrets."jellyfin/api_key".path}:/app/config/jellyfin.key"
+          "${config.sops.secrets."navidrome/username".path}:/app/config/navidrome-username.key"
+          "${config.sops.secrets."navidrome/token".path}:/app/config/navidrome-token.key"
+          "${config.sops.secrets."navidrome/salt".path}:/app/config/navidrome-salt.key"
         ];
         environment = {
           TZ = "${config.sops.secrets.time_zone.path}";
           # HOMEPAGE_FILE_SONARR_KEY = "/app/config/sonarr.key";
           # HOMEPAGE_FILE_RADARR_KEY = "/app/config/radarr.key";
           HOMEPAGE_FILE_JELLYFIN_KEY = "/app/config/jellyfin.key";
+          HOMEPAGE_FILE_NAVIDROME_USERNAME = "/app/config/navidrome-username.key";
+          HOMEPAGE_FILE_NAVIDROME_TOKEN = "/app/config/navidrome-token.key";
+          HOMEPAGE_FILE_NAVIDROME_SALT = "/app/config/navidrome-salt.key";
         };
         # environmentFiles = [
         #   config.age.secrets.paperless.path
