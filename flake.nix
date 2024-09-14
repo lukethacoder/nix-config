@@ -60,7 +60,6 @@
             ./containers/traefik
             ./containers/jellyfin
             ./containers/gonic
-            ./containers/lms
             ./containers/navidrome
 
             # Users
