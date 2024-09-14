@@ -54,11 +54,6 @@
             # Import machine config + secrets
             ./machines/nixos
             ./machines/nixos/opslag
-            # nix-secrets
-            # ./secrets
-            # inputs.secrets
-            # builtins.toString secrets
-            # agenix.nixosModules.default
 
             # Services and applications
             ./containers/homepage
