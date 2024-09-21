@@ -42,6 +42,7 @@
           modules = [
             # Base configuration and modules
             ./modules/sops
+            ./modules/tailscale
             ./modules/fonts
             ./modules/gnome
             ./modules/podman
