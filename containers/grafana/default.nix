@@ -20,7 +20,8 @@ in
         volumes = [
           "${vars.serviceConfigRoot}/grafana:/var/lib/grafana"
         ];
-      }
-    }
-  }
+        ports = [ "3232:3000" ];
+      };
+    };
+  };
 }

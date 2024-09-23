@@ -50,10 +50,10 @@ in {
         autoStart = true;
         extraOptions = [
           "-l=traefik.enable=true"
-          # "-l=traefik.http.routers.home.rule=Host(`${config.age.secrets.domainName.path}`)"
-          "-l=traefik.http.services.home.loadbalancer.server.port=3000"
+          "-l=traefik.http.routers.homepage.rule=Host(`home.${builtins.readFile config.sops.secrets.domain_name.path}`)"
+          "-l=traefik.http.services.homepage.loadbalancer.server.port=3333"
         ];
-        ports = [ "3000:3000" ];
+        ports = [ "3333:3000" ];
         volumes = [
           "${vars.serviceConfigRoot}/homepage/config:/app/config"
           "${homepageSettings.docker}:/app/config/docker.yaml"

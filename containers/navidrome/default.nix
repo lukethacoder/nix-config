@@ -30,8 +30,8 @@ in {
           ND_SESSIONTIMEOUT = "24h";
           ND_BASEURL = "http://navidrome.${builtins.readFile config.sops.secrets.domain_name.path}";
           ND_LASTFM_ENABLED = "true";
-          ND_LASTFM_APIKEY = config.sops.secrets."lastfm/api_key".path;
-          ND_LASTFM_SECRET = config.sops.secrets."lastfm/api_secret".path;
+          ND_LASTFM_APIKEY = builtins.readFile config.sops.secrets."lastfm/api_key".path;
+          ND_LASTFM_SECRET = builtins.readFile config.sops.secrets."lastfm/api_secret".path;
         };
         extraOptions = [
           "-l=traefik.enable=true"
