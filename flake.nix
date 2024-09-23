@@ -59,8 +59,10 @@
             # Services and applications
             ./containers/homepage
             ./containers/traefik
+            ./containers/grafana
+            # ./containers/adguard
             ./containers/jellyfin
-            ./containers/gonic
+            # ./containers/gonic
             ./containers/navidrome
 
             # Users
