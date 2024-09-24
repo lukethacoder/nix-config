@@ -59,7 +59,7 @@
             # Services and applications
             ./containers/homepage
             ./containers/traefik
-            ./containers/deluge
+            # ./containers/deluge
             ./containers/grafana
             # ./containers/adguard
             ./containers/jellyfin

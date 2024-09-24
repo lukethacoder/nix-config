@@ -7,7 +7,7 @@ let
     "${vars.serviceConfigRoot}/prowlarr"
     "${vars.serviceConfigRoot}/recyclarr"
     "${vars.mainArray}/Media/Downloads"
-    "${vars.cacheArray}/Media/Downloads.tmp"
+    "${vars.serviceConfigRoot}/Downloads.tmp"
   ];
 in
 {
@@ -34,7 +34,7 @@ in
         ];
         volumes = [
           "${vars.mainArray}/Media/Downloads:/data/completed"
-          "${vars.cacheArray}/Media/Downloads.tmp:/data/incomplete"
+          "${vars.serviceConfigRoot}/Downloads.tmp:/data/incomplete"
           "${vars.serviceConfigRoot}/deluge:/config"
         ];
         environment = {
