@@ -20,6 +20,15 @@ in
       domain_name = {};
       email_address = {};
       "tailscale/otp" = {};
+      # "tailscale/host_domain" = {};
+      "duckdns/token" = {};
+      "wireguard/enpoint_ip" = {};
+      "wireguard/enpoint_port" = {};
+      "wireguard/public_key" = {};
+      "wireguard/private_key" = {};
+      "wireguard/addresses" = {};
+      # "adguard/username" = {};
+      # "adguard/password" = {};
       "jellyfin/api_key" = {};
       "navidrome/username" = {};
       "navidrome/token" = {};
