@@ -9,7 +9,7 @@ in
 
   sops = {
     defaultSopsFile = "${secretsFile}";
-    validateSopsFiles = false;
+    validateSopsFiles = true;
 
     age = {
       sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
@@ -22,8 +22,8 @@ in
       "tailscale/otp" = {};
       # "tailscale/host_domain" = {};
       "duckdns/token" = {};
-      "wireguard/enpoint_ip" = {};
-      "wireguard/enpoint_port" = {};
+      "wireguard/endpoint_ip" = {};
+      "wireguard/endpoint_port" = {};
       "wireguard/public_key" = {};
       "wireguard/private_key" = {};
       "wireguard/addresses" = {};
