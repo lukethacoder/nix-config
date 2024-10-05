@@ -72,7 +72,10 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit inputs; };
+              home-manager.extraSpecialArgs = {
+                inherit inputs;
+                vars = import ./machines/nixos/vars.nix;
+              };
               home-manager.users.luke.imports = [
                 # agenix.homeManagerModules.default
                 # nix-index-database.hmModules.nix-index
