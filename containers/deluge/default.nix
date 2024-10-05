@@ -12,6 +12,12 @@ let
 in
 {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
+
+  # Copy local deluge.conf to act as the core.conf for the container
+  home.file = {
+    "${vars.serviceConfigRoot}/deluge/deluge.conf".source = builtins.readFile ./deluge.conf;
+  };
+
   virtualisation.oci-containers = {
     containers = {
       deluge = {
@@ -35,12 +41,14 @@ in
         volumes = [
           "${vars.mainArray}/Media/Downloads:/data/completed"
           "${vars.serviceConfigRoot}/Downloads.tmp:/data/incomplete"
-          "${vars.serviceConfigRoot}/deluge:/config"
+          "${vars.serviceConfigRoot}/deluge/config:/config"
+          "${vars.serviceConfigRoot}/deluge/deluge.conf:/config/core.conf"
         ];
         environment = {
           TZ = vars.timeZone;
           PUID = "994";
           GUID = "993";
+          DELUGE_LOGLEVEL = "info";
         };
       };
       gluetun = {
@@ -49,26 +57,30 @@ in
         extraOptions = [
           "--pull=newer"
           "--cap-add=NET_ADMIN"
+          "--device=/dev/net/tun:/dev/net/tun"
           "-l=traefik.enable=true"
           "-l=traefik.http.routers.deluge.rule=Host(`deluge.${builtins.readFile config.sops.secrets.domain_name.path}`)"
           "-l=traefik.http.routers.deluge.service=deluge"
-          "-l=traefik.http.services.deluge.loadbalancer.server.port=8112"
-          "--device=/dev/net/tun:/dev/net/tun"
+          "-l=traefik.http.services.deluge.loadbalancer.server.port=8083"
           "-l=homepage.group=Arr"
           "-l=homepage.name=Gluetun"
           "-l=homepage.icon=gluetun.svg"
           "-l=homepage.href=https://deluge.${builtins.readFile config.sops.secrets.domain_name.path}"
           "-l=homepage.description=VPN killswitch"
           "-l=homepage.widget.type=gluetun"
-          "-l=homepage.widget.url=http://gluetun:8000"
+          "-l=homepage.widget.url=http://gluetun:8083"
         ];
         ports = [
-          "127.0.0.1:8083:8000"
+          "127.0.0.1:8083:8112"
+        ];
+        volumes = [
+          "${vars.serviceConfigRoot}/gluetun:/gluetun"
         ];
         environment = {
+          TZ = vars.timeZone;
           VPN_TYPE = "wireguard";
           VPN_SERVICE_PROVIDER = "custom";
-          WIREGUARD_ENDPOINT = config.sops.secrets."wireguard/enpoint_ip".path;
+          WIREGUARD_ENDPOINT_IP = config.sops.secrets."wireguard/enpoint_ip".path;
           WIREGUARD_ENDPOINT_PORT = config.sops.secrets."wireguard/enpoint_port".path;
           WIREGUARD_PUBLIC_KEY = config.sops.secrets."wireguard/public_key".path;
           WIREGUARD_PRIVATE_KEY = config.sops.secrets."wireguard/private_key".path;
