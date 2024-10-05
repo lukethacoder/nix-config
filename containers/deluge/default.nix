@@ -13,11 +13,6 @@ in
 {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
-  # Copy local deluge.conf to act as the core.conf for the container
-  home.file = {
-    "${vars.serviceConfigRoot}/deluge/deluge.conf".source = builtins.readFile ./deluge.conf;
-  };
-
   virtualisation.oci-containers = {
     containers = {
       deluge = {
@@ -29,14 +24,14 @@ in
         extraOptions = [
           "--pull=newer"
           "--network=container:gluetun"
-          "-l=homepage.group=Arr"
-          "-l=homepage.name=Deluge"
-          "-l=homepage.icon=deluge.svg"
-          "-l=homepage.href=https://deluge.${builtins.readFile config.sops.secrets.domain_name.path}"
-          "-l=homepage.description=Torrent client"
-          "-l=homepage.widget.type=deluge"
-          "-l=homepage.widget.password=deluge"
-          "-l=homepage.widget.url=http://gluetun:8112"
+          # "-l=homepage.group=Arr"
+          # "-l=homepage.name=Deluge"
+          # "-l=homepage.icon=deluge.svg"
+          # "-l=homepage.href=https://deluge.${builtins.readFile config.sops.secrets.domain_name.path}"
+          # "-l=homepage.description=Torrent client"
+          # "-l=homepage.widget.type=deluge"
+          # "-l=homepage.widget.password=deluge"
+          # "-l=homepage.widget.url=http://gluetun:8112"
         ];
         volumes = [
           "${vars.mainArray}/Media/Downloads:/data/completed"
@@ -62,13 +57,13 @@ in
           "-l=traefik.http.routers.deluge.rule=Host(`deluge.${builtins.readFile config.sops.secrets.domain_name.path}`)"
           "-l=traefik.http.routers.deluge.service=deluge"
           "-l=traefik.http.services.deluge.loadbalancer.server.port=8083"
-          "-l=homepage.group=Arr"
-          "-l=homepage.name=Gluetun"
-          "-l=homepage.icon=gluetun.svg"
-          "-l=homepage.href=https://deluge.${builtins.readFile config.sops.secrets.domain_name.path}"
-          "-l=homepage.description=VPN killswitch"
-          "-l=homepage.widget.type=gluetun"
-          "-l=homepage.widget.url=http://gluetun:8083"
+          # "-l=homepage.group=Arr"
+          # "-l=homepage.name=Gluetun"
+          # "-l=homepage.icon=gluetun.svg"
+          # "-l=homepage.href=https://deluge.${builtins.readFile config.sops.secrets.domain_name.path}"
+          # "-l=homepage.description=VPN killswitch"
+          # "-l=homepage.widget.type=gluetun"
+          # "-l=homepage.widget.url=http://gluetun:8083"
         ];
         ports = [
           "127.0.0.1:8083:8112"

@@ -1,4 +1,4 @@
-{ inputs, lib, config, pkgs, ... }:
+{ inputs, vars, lib, config, pkgs, ... }:
 {
   programs.home-manager.enable = true;
   home.stateVersion = "24.05";
@@ -33,6 +33,11 @@
     "org/gnome/settings-daemon/plugins/power" = {
       sleep-inactive-ac-type = "nothing";
     };
+  };
+
+  # Copy local deluge.conf to act as the core.conf for the container
+  home.file = {
+    "${vars.serviceConfigRoot}/deluge/deluge.conf".source = ./deluge.conf;
   };
 
   programs.gpg.enable = true;
