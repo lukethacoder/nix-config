@@ -64,7 +64,6 @@
             # ./containers/adguard
             ./containers/jellyfin
             ./containers/navidrome
-            ./containers/obsidian
 
             # Users
             ./users/luke
