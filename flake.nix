@@ -63,8 +63,8 @@
             ./containers/grafana
             # ./containers/adguard
             ./containers/jellyfin
-            # ./containers/gonic
             ./containers/navidrome
+            ./containers/obsidian
 
             # Users
             ./users/luke
