@@ -64,7 +64,7 @@ in
           "-l=homepage.href=https://deluge.${builtins.readFile config.sops.secrets.domain_name.path}"
           "-l=homepage.description=VPN killswitch"
           "-l=homepage.widget.type=gluetun"
-          "-l=homepage.widget.url=http://gluetun:8083"
+          "-l=homepage.widget.url=http://gluetun:8000"
         ];
         ports = [
           "127.0.0.1:8083:8000"
