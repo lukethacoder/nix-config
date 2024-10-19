@@ -1,4 +1,4 @@
-{ inputs, vars, lib, config, pkgs, ... }:
+{ inputs, specialArgs, lib, config, pkgs, ... }:
 {
   programs.home-manager.enable = true;
   home.stateVersion = "24.05";
@@ -37,7 +37,7 @@
 
   # Copy local deluge.conf to act as the core.conf for the container
   home.file = {
-    "${vars.serviceConfigRoot}/deluge/deluge.conf".source = ./deluge.conf;
+    "${specialArgs.vars.serviceConfigRoot}/deluge/deluge.conf".source = ./deluge.conf;
   };
 
   programs.gpg.enable = true;

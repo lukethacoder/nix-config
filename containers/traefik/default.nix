@@ -19,9 +19,10 @@ in
           "--api.insecure=true"
           "--providers.docker=true"
           "--providers.docker.exposedbydefault=false"
-          "--entrypoints.web.address=:80"
           "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
-          "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
+          "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
+          "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=duckdns"
+          "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=8.8.8.8:53"
           "--certificatesresolvers.letsencrypt.acme.email=${builtins.readFile config.sops.secrets.email_address.path}"
           # HTTP
           "--entrypoints.web.address=:80"
@@ -33,7 +34,6 @@ in
           "--entrypoints.websecure.http.tls.certResolver=letsencrypt"
           "--entrypoints.websecure.http.tls.domains[0].main=${builtins.readFile config.sops.secrets.domain_name.path}"
           "--entrypoints.websecure.http.tls.domains[0].sans=*.${builtins.readFile config.sops.secrets.domain_name.path}"
-
         ];
         extraOptions = [
           # Proxying Traefik itself
@@ -52,9 +52,9 @@ in
           "443:443"
           "80:80"
         ];
-        # environmentFiles = [
-        #   config.age.secrets.cloudflareDnsApiCredentials.path
-        # ];
+        environment = {
+          DUCKDNS_TOKEN = builtins.readFile config.sops.secrets."duckdns/token".path;
+        };
         volumes = [
           "/var/run/podman/podman.sock:/var/run/docker.sock:ro"
           "${vars.serviceConfigRoot}/traefik/acme.json:/acme.json"

@@ -2,12 +2,24 @@
 {
   environment.systemPackages = [ pkgs.tailscale ];
 
-  networking.firewall.allowedUDPPorts = [
-    config.services.tailscale.port
-  ];
-  networking.firewall.trustedInterfaces = [
-    "tailscale0"
-  ];
+  networking = {
+    firewall = {
+      allowedUDPPorts = [
+        config.services.tailscale.port
+      ];
+      trustedInterfaces = [
+        "tailscale0"
+      ];
+    };
+    # nameservers = [
+    #   "100.100.100.100"
+    #   "8.8.8.8"
+    #   "1.1.1.1"
+    # ];
+    # search = [
+    #   "${builtins.readFile config.sops.secrets."tailscale/host_domain".path}"
+    # ];
+  };
 
   services.tailscale = {
     enable = true;
