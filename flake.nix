@@ -62,7 +62,7 @@
             ./containers/deluge
             ./containers/grafana
             # ./containers/adguard
-            ./containers/nextcloud
+            # ./containers/syncthing
             ./containers/jellyfin
             ./containers/navidrome
 
