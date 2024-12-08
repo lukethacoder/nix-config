@@ -3,20 +3,17 @@
 let
   nextcloudDataDir = "${vars.serviceConfigRoot}/nextcloud-data";
   nextcloudDbDir = "${vars.serviceConfigRoot}/nextcloud-db";
-  nextcloudDbDirPostgres = "${vars.serviceConfigRoot}/nextcloud-db-postgres";
 in
 {
   system.activationScripts.nextcloudFolders = ''
     mkdir -p ${nextcloudDataDir}
     mkdir -p ${nextcloudDbDir}
-    mkdir -p ${nextcloudDbDirPostgres}
   '';
 
   # Ensure necessary directories exist
   systemd.tmpfiles.rules = [
     "d ${nextcloudDataDir} 0755 nextcloud nextcloud -"
     "d ${nextcloudDbDir} 0755 nextcloud nextcloud -"
-    "d ${nextcloudDbDirPostgres} 0755 nextcloud nextcloud -"
   ];
 
   systemd.user.extraConfig = "DefaultTimeoutStopSec=30s";
@@ -31,89 +28,97 @@ in
     '';
 
   # User and group for Nextcloud
-  # users.users.nextcloud = {
-  #   isSystemUser = true;
-  #   home = nextcloudDataDir;
-  #   group = "nextcloud";
-  # };
-  # users.groups.nextcloud = {};
+  users.users.nextcloud = {
+    isSystemUser = true;
+    home = nextcloudDataDir;
+    group = "nextcloud";
+  };
+  users.groups.nextcloud = {};
 
-  # security.acme = {
-  #   acceptTerms = true;
-  #   defaults = {
-  #     email = builtins.readFile config.sops.secrets.email_address.path;
-  #   };
-  # };
-  
-  services = {
-    # nginx.virtualHosts = {
-    #   "cloud.why.duckdns.org" = {
-    #     forceSSL = true;
-    #     enableACME = true;
-    #   };
-
-    #   "onlyoffice.why.duckdns.org" = {
-    #     forceSSL = true;
-    #     enableACME = true;
-    #   };
-    # };
-
-    nginx.virtualHosts."localhost".listen = [
-      {
-        addr = "127.0.0.1";
-        port = 8080;
-      }
-    ];
-
-    nextcloud = {
-      enable = true;
-      hostName = "localhost";
-      https = false;
-
-       # Need to manually increment with every major upgrade.
-      package = pkgs.nextcloud29;
-
-      # Let NixOS install and configure the database automatically.
-      database.createLocally = true;
-
-      # Let NixOS install and configure Redis caching automatically.
-      configureRedis = true;
-
-      # Increase the maximum file upload size to avoid problems uploading videos.
-      maxUploadSize = "16G";
-
-      autoUpdateApps.enable = true;
-      extraAppsEnable = true;
-      extraApps = with config.services.nextcloud.package.packages.apps; {
-        # List of apps we want to install and are already packaged in
-        # https://github.com/NixOS/nixpkgs/blob/master/pkgs/servers/nextcloud/packages/nextcloud-apps.json
-        # inherit calendar contacts mail notes onlyoffice tasks;
-        inherit onlyoffice;
-
-        # Custom app installation example.
-        # cookbook = pkgs.fetchNextcloudApp rec {
-        #   url =
-        #     "https://github.com/nextcloud/cookbook/releases/download/v0.10.2/Cookbook-0.10.2.tar.gz";
-        #   sha256 = "sha256-XgBwUr26qW6wvqhrnhhhhcN4wkI+eXDHnNSm1HDbP6M=";
-        # };
+  virtualisation.oci-containers = {
+    containers = {
+      nextcloud-aio-mastercontainer = {
+        image = "nextcloud/all-in-one:latest";
+        autoStart = true;
+        volumes = [
+          # "${nextcloudDataDir}:/mnt/docker-aio-config"
+          "nextcloud_aio_mastercontainer:/mnt/docker-aio-config"
+          "/var/run/podman/podman.sock:/var/run/docker.sock:ro"
+        ];
+        ports = [
+          "8347:80"
+          "8348:8080"
+          "8443:8443"
+        ];
+        environment = {
+          TZ = vars.timeZone;
+        };
+        extraOptions = [
+          "--network=nextcloud-net"
+        ];
       };
-
-      config = {
-        dbtype = "pgsql";
-        adminuser = "admin";
-        adminpassFile = "${vars.serviceConfigRoot}/nextcloud-password.txt";
-      };
-
-      settings = {
-        overwriteprotocol = "https";
-        default_phone_region = "PT";
-      };
-    };
-
-    onlyoffice = {
-      enable = true;
-      # hostname = "onlyoffice.lukethacoder.duckdns.org";
+      # nextcloud_db_02 = {
+      #   image = "postgres:17.2";
+      #   autoStart = true;
+      #   volumes = [
+      #     "${nextcloudDbDirPostgres}:/var/lib/postgresql/data"
+      #   ];
+      #   ports = [
+      #     "5433:5432"
+      #   ];
+      #   cmd = [
+      #     "--restart=always"
+      #     "--restart-delay=20s"
+      #     # MariaDB fix
+      #     # "--innodb-read-only-compressed=OFF"
+      #     # "--transaction-isolation=READ-COMMITTED"
+      #     # "--log-bin=binlog"
+      #     # "--binlog-format=ROW"
+      #   ];
+      #   environment = {
+      #     POSTGRES_DB = "nextcloud";
+      #     POSTGRES_USER = "luke";
+      #     POSTGRES_PASSWORD = "luke";
+      #     # MYSQL_ROOT_PASSWORD = "root";
+      #     # MYSQL_DATABASE = "nextcloud";
+      #     # MYSQL_USER = "luke";
+      #     # MYSQL_PASSWORD = "luke";
+      #     TZ = vars.timeZone;
+      #   };
+      #   extraOptions = [
+      #     "--network=nextcloud-net"
+      #   ];
+      # };
+      # nextcloud_db = {
+      #   image = "mariadb:10.11";
+      #   autoStart = true;
+      #   volumes = [
+      #     "${nextcloudDbDir}:/var/lib/mysql"
+      #   ];
+      #   # ports = [
+      #   #   "3306:3306"
+      #   # ];
+      #   cmd = [
+      #     # MariaDB fix
+      #     "--innodb-read-only-compressed=OFF"
+      #     "--transaction-isolation=READ-COMMITTED"
+      #     "--log-bin=binlog"
+      #     "--binlog-format=ROW"
+      #   ];
+      #   environment = {
+      #     MYSQL_ROOT_PASSWORD = "root";
+      #     MYSQL_DATABASE = "nextcloud";
+      #     MYSQL_USER = "luke";
+      #     MYSQL_PASSWORD = "luke";
+      #     TZ = vars.timeZone;
+      #   };
+      #   extraOptions = [
+      #     "--network=nextcloud-net"
+      #   ];
+      # };
     };
   };
 
+  # Firewall rules for Nextcloud
+  networking.firewall.allowedTCPPorts = [ 8080 ]; # Port for Nextcloud
 }
