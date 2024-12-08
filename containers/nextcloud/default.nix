@@ -31,117 +31,89 @@ in
     '';
 
   # User and group for Nextcloud
-  users.users.nextcloud = {
-    isSystemUser = true;
-    home = nextcloudDataDir;
-    group = "nextcloud";
-  };
-  users.groups.nextcloud = {};
+  # users.users.nextcloud = {
+  #   isSystemUser = true;
+  #   home = nextcloudDataDir;
+  #   group = "nextcloud";
+  # };
+  # users.groups.nextcloud = {};
 
-  virtualisation.oci-containers = {
-    containers = {
-      nextcloud = {
-        image = "nextcloud:latest";
-        autoStart = true;
-        dependsOn = [
-          "nextcloud_db_02"
-        ];
-        volumes = [
-          "${nextcloudDataDir}:/var/www/html/data"
-        ];
-        cmd = [
-          "--restart=always"
-          "--restart-delay=20s"
-        ];
-        environment = {
-          # MariaDB
-          # MYSQL_HOST = "192.168.8.202:3306";
-          # MYSQL_HOST = "172.20.0.21";
-          # MYSQL_HOST = "nextcloud_db";
-          # MYSQL_DATABASE = "nextcloud";
-          # MYSQL_USER = "luke";
-          # MYSQL_PASSWORD = "luke";
+  # security.acme = {
+  #   acceptTerms = true;
+  #   defaults = {
+  #     email = builtins.readFile config.sops.secrets.email_address.path;
+  #   };
+  # };
+  
+  services = {
+    # nginx.virtualHosts = {
+    #   "cloud.why.duckdns.org" = {
+    #     forceSSL = true;
+    #     enableACME = true;
+    #   };
 
-          # Postgres
-          POSTGRES_HOST = "nextcloud_db"; # may need a '_1' appended?
-          POSTGRES_DB = "nextcloud";
-          POSTGRES_USER = "luke";
-          POSTGRES_PASSWORD = "luke";
+    #   "onlyoffice.why.duckdns.org" = {
+    #     forceSSL = true;
+    #     enableACME = true;
+    #   };
+    # };
 
-          NEXTCLOUD_ADMIN_USER = "luke";
-          NEXTCLOUD_ADMIN_PASSWORD = "luke";
-          NEXTCLOUD_TRUSTED_DOMAINS = "localhost,192.168.8.202,nextcloud.lukethacoder.duckdns.org";
-          TZ = vars.timeZone;
-        };
-        ports = [
-          "8347:80"
-        ];
-        extraOptions = [
-          "--network=nextcloud-net"
-        ];
+    nginx.virtualHosts."localhost".listen = [
+      {
+        addr = "127.0.0.1";
+        port = 8080;
+      }
+    ];
+
+    nextcloud = {
+      enable = true;
+      hostName = "localhost";
+      https = false;
+
+       # Need to manually increment with every major upgrade.
+      package = pkgs.nextcloud29;
+
+      # Let NixOS install and configure the database automatically.
+      database.createLocally = true;
+
+      # Let NixOS install and configure Redis caching automatically.
+      configureRedis = true;
+
+      # Increase the maximum file upload size to avoid problems uploading videos.
+      maxUploadSize = "16G";
+
+      autoUpdateApps.enable = true;
+      extraAppsEnable = true;
+      extraApps = with config.services.nextcloud.package.packages.apps; {
+        # List of apps we want to install and are already packaged in
+        # https://github.com/NixOS/nixpkgs/blob/master/pkgs/servers/nextcloud/packages/nextcloud-apps.json
+        # inherit calendar contacts mail notes onlyoffice tasks;
+        inherit onlyoffice;
+
+        # Custom app installation example.
+        # cookbook = pkgs.fetchNextcloudApp rec {
+        #   url =
+        #     "https://github.com/nextcloud/cookbook/releases/download/v0.10.2/Cookbook-0.10.2.tar.gz";
+        #   sha256 = "sha256-XgBwUr26qW6wvqhrnhhhhcN4wkI+eXDHnNSm1HDbP6M=";
+        # };
       };
-      nextcloud_db_02 = {
-        image = "postgres:17.2";
-        autoStart = true;
-        volumes = [
-          "${nextcloudDbDirPostgres}:/var/lib/postgresql/data"
-        ];
-        ports = [
-          "5433:5432"
-        ];
-        cmd = [
-          "--restart=always"
-          "--restart-delay=20s"
-          # MariaDB fix
-          # "--innodb-read-only-compressed=OFF"
-          # "--transaction-isolation=READ-COMMITTED"
-          # "--log-bin=binlog"
-          # "--binlog-format=ROW"
-        ];
-        environment = {
-          POSTGRES_DB = "nextcloud";
-          POSTGRES_USER = "luke";
-          POSTGRES_PASSWORD = "luke";
-          # MYSQL_ROOT_PASSWORD = "root";
-          # MYSQL_DATABASE = "nextcloud";
-          # MYSQL_USER = "luke";
-          # MYSQL_PASSWORD = "luke";
-          TZ = vars.timeZone;
-        };
-        extraOptions = [
-          "--network=nextcloud-net"
-        ];
+
+      config = {
+        dbtype = "pgsql";
+        adminuser = "admin";
+        adminpassFile = "${vars.serviceConfigRoot}/nextcloud-password.txt";
       };
-      # nextcloud_db = {
-      #   image = "mariadb:10.11";
-      #   autoStart = true;
-      #   volumes = [
-      #     "${nextcloudDbDir}:/var/lib/mysql"
-      #   ];
-      #   # ports = [
-      #   #   "3306:3306"
-      #   # ];
-      #   cmd = [
-      #     # MariaDB fix
-      #     "--innodb-read-only-compressed=OFF"
-      #     "--transaction-isolation=READ-COMMITTED"
-      #     "--log-bin=binlog"
-      #     "--binlog-format=ROW"
-      #   ];
-      #   environment = {
-      #     MYSQL_ROOT_PASSWORD = "root";
-      #     MYSQL_DATABASE = "nextcloud";
-      #     MYSQL_USER = "luke";
-      #     MYSQL_PASSWORD = "luke";
-      #     TZ = vars.timeZone;
-      #   };
-      #   extraOptions = [
-      #     "--network=nextcloud-net"
-      #   ];
-      # };
+
+      settings = {
+        overwriteprotocol = "https";
+        default_phone_region = "PT";
+      };
+    };
+
+    onlyoffice = {
+      enable = true;
+      # hostname = "onlyoffice.lukethacoder.duckdns.org";
     };
   };
 
-  # Firewall rules for Nextcloud
-  networking.firewall.allowedTCPPorts = [ 8080 ]; # Port for Nextcloud
 }
