@@ -65,6 +65,7 @@
             # ./containers/syncthing
             ./containers/jellyfin
             ./containers/navidrome
+            ./containers/nextcloud
 
             # Users
             ./users/luke
