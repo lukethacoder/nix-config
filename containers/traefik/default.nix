@@ -42,7 +42,7 @@ in
           "-l=traefik.http.services.traefik.loadbalancer.server.port=8080"
           "-l=homepage.group=Services"
           "-l=homepage.name=Traefik"
-          "-l=homepage.icon=traefik.svg"
+          "-l=homepage.icon=traefik-proxy.svg"
           "-l=homepage.href=https://proxy.${builtins.readFile config.sops.secrets.domain_name.path}"
           "-l=homepage.description=Reverse proxy"
           "-l=homepage.widget.type=traefik"
