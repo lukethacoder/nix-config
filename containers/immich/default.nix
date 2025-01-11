@@ -12,22 +12,40 @@ in {
       ${vars.serviceConfigRoot}/immich/pgdata
   '';
 
-  systemd.services.init-filerun-network-and-files = {
-    description = "Create the network bridge for Immich.";
-    after = [ "network.target" ];
-    wantedBy = [ "multi-user.target" ];
+  # systemd.services.init-filerun-network-and-files = {
+  #   description = "Create the network bridge for Immich.";
+  #   after = [ "network.target" ];
+  #   wantedBy = [ "multi-user.target" ];
     
-    serviceConfig.Type = "oneshot";
-    script = let dockercli = "${config.virtualisation.docker.package}/bin/docker";
-      in ''
-        # immich-net network
-        check=$(${dockercli} network ls | grep "immich-net" || true)
-        if [ -z "$check" ]; then
-          ${dockercli} network create immich-net
-        else
-          echo "immich-net already exists in docker"
-        fi
-      '';
+  #   serviceConfig.Type = "oneshot";
+  #   script = let dockercli = "${config.virtualisation.docker.package}/bin/docker";
+  #     in ''
+  #       # immich-net network
+  #       check=$(${dockercli} network ls | grep "immich-net" || true)
+  #       if [ -z "$check" ]; then
+  #         ${dockercli} network create immich-net
+  #       else
+  #         echo "immich-net already exists in docker"
+  #       fi
+  #     '';
+  # };
+
+  system.activationScripts.init-immich-network = let
+    backend = config.virtualisation.oci-containers.backend;
+    backendBin = "${pkgs.${backend}}/bin/${backend}";
+  in ''
+      # immich-net network
+      check=$(${backendBin} network ls | grep "immich-net" || true)
+      if [ -z "$check" ]; then
+        ${backendBin} network create immich-net
+      else
+        echo "immich-net already exists in docker"
+      fi
+  '';
+
+  # Keep redis from complaining
+  boot.kernel.sysctl = {
+    "vm.overcommit_memory" = 1;
   };
 
   # Immich
@@ -55,21 +73,21 @@ in {
           };
           extraOptions = [
             "--network=immich-net"
-            "--gpus=all"
+            # "--gpus=all"
 
             "-l=traefik.enable=true"
             "-l=traefik.http.routers.immich.rule=Host(`immich.${builtins.readFile config.sops.secrets.domain_name.path}`)"
             "-l=traefik.http.services.immich.loadbalancer.server.port=2283"
             "-l=homepage.group=Media"
             "-l=homepage.name=Immich"
-            "-l=homepage.icon=https://simpleicons.org/icons/pioneerdj.svg"
+            "-l=homepage.icon=immich"
             "-l=homepage.href=https://immich.${builtins.readFile config.sops.secrets.domain_name.path}"
             "-l=homepage.description=Photo Sync"
             "-l=homepage.widget.type=immich"
+            "-l=homepage.widget.url=https://immich.${builtins.readFile config.sops.secrets.domain_name.path}"
             # "-l=homepage.widget.user={{HOMEPAGE_FILE_NAVIDROME_USERNAME}}"
             # "-l=homepage.widget.token={{HOMEPAGE_FILE_NAVIDROME_TOKEN}}"
             # "-l=homepage.widget.salt={{HOMEPAGE_FILE_NAVIDROME_SALT}}"
-            "-l=homepage.widget.url=https://immich.${builtins.readFile config.sops.secrets.domain_name.path}"
           ];
         };
 
@@ -84,7 +102,7 @@ in {
           ];
         };
 
-        immich_postgres16 = {
+        immich_postgres = {
           autoStart = true;
           image = "tensorchord/pgvecto-rs:pg16-v0.2.1";
           ports = [
@@ -105,4 +123,4 @@ in {
       };
     };
   };
-};
+}
