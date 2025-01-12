@@ -101,9 +101,8 @@ in {
             "-l=homepage.description=Photo Sync"
             "-l=homepage.widget.type=immich"
             "-l=homepage.widget.url=https://immich.${builtins.readFile config.sops.secrets.domain_name.path}"
-            # "-l=homepage.widget.user={{HOMEPAGE_FILE_NAVIDROME_USERNAME}}"
-            # "-l=homepage.widget.token={{HOMEPAGE_FILE_NAVIDROME_TOKEN}}"
-            # "-l=homepage.widget.salt={{HOMEPAGE_FILE_NAVIDROME_SALT}}"
+            "-l=homepage.widget.key=${builtins.readFile config.sops.secrets."immich/api_key".path}"
+            "-l=homepage.widget.version=2"
           ];
         };
 

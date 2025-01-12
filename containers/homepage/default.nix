@@ -49,6 +49,7 @@ in {
         image = "ghcr.io/gethomepage/homepage:latest";
         autoStart = true;
         extraOptions = [
+          "--pull=newer"
           "-l=traefik.enable=true"
           "-l=traefik.http.routers.homepage.rule=Host(`home.${builtins.readFile config.sops.secrets.domain_name.path}`)"
           "-l=traefik.http.services.homepage.loadbalancer.server.port=3000"
