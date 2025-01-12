@@ -37,6 +37,7 @@ in
       "lastfm/api_secret" = {};
       "immich/postgres_username" = {};
       "immich/postgres_password" = {};
+      "immich/api_key" = {};
       samba_password = {};
     };
 
