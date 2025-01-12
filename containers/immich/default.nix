@@ -1,34 +1,45 @@
 { config, vars, pkgs, ... }:
-let directories = [
-  "${vars.serviceConfigRoot}/immich"
-  "${vars.mainArray}/Photos/immich"
-];
+let 
+  directories = [
+    "${vars.serviceConfigRoot}/immich"
+    "${vars.serviceConfigRoot}/immich/config"
+    "${vars.mainArray}/Photos/immich"
+    "${vars.mainArray}/Photos/immich/encoded-video"
+  ];
+  db_name = "immich";
 in {
-  systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
-  system.userActivationScripts.navidrome-data.text = ''
+  # users = {
+  #   groups.share = {
+  #     gid = 993;
+  #   };
+  #   users.share = {
+  #     uid = 994;
+  #     isSystemUser = true;
+  #     group = "share";
+  #   };
+  # };
+
+  system.userActivationScripts.immich-data.text = ''
     mkdir -p ${vars.serviceConfigRoot}/immich \
       ${vars.serviceConfigRoot}/immich/config \
-      ${vars.serviceConfigRoot}/immich/pgdata
+      ${vars.serviceConfigRoot}/immich/pgdata \
+      ${vars.mainArray}/Photos/immich \
+      ${vars.mainArray}/Photos/immich/encoded-video
   '';
 
-  # systemd.services.init-filerun-network-and-files = {
-  #   description = "Create the network bridge for Immich.";
-  #   after = [ "network.target" ];
-  #   wantedBy = [ "multi-user.target" ];
-    
-  #   serviceConfig.Type = "oneshot";
-  #   script = let dockercli = "${config.virtualisation.docker.package}/bin/docker";
-  #     in ''
-  #       # immich-net network
-  #       check=$(${dockercli} network ls | grep "immich-net" || true)
-  #       if [ -z "$check" ]; then
-  #         ${dockercli} network create immich-net
-  #       else
-  #         echo "immich-net already exists in docker"
-  #       fi
+  # # not ideal, but doesn't seem to let windows have write access without 0777 :(
+  # system.activationScripts.giveImmichShareUserAccessToFolders = 
+  #   let
+  #     user = config.users.users.share.name;
+  #     group = config.users.users.share.group;
+  #   in
+  #     ''
+  #       chown -R ${config.users.users.share.name}:${config.users.users.share.group} /mnt/user/Photos
+  #       chmod -R 0777 /mnt/user/Photos
   #     '';
-  # };
+  
+  systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
   system.activationScripts.init-immich-network = let
     backend = config.virtualisation.oci-containers.backend;
@@ -59,25 +70,30 @@ in {
             "${vars.serviceConfigRoot}/immich/config:/config"
             "${vars.serviceConfigRoot}/immich/config/machine-learning:/config/machine-learning"
             "${vars.mainArray}/Photos/immich:/photos"
+            "${vars.mainArray}/Photos/immich/encoded-video/.immich:/photos/encoded-video/.immich"
           ];
           ports = [ "2283:8080" ];
           environment = {
-            PUID = "1000";
-            PGID = "1000";
+            PUID = "0";
+            PGID = "0";
             TZ = config.sops.secrets.time_zone.path;
-            DB_HOSTNAME = "immich_postgres";
+            
+            # using '--network="immich-net"' means using the container name doesn't resolve correctly 
+            DB_HOSTNAME = "10.89.0.1"; # "immich_postgres"
             DB_USERNAME = "postgres";
             DB_PASSWORD = "postgres";
-            DB_DATABASE_NAME = "immich";
-            REDIS_HOSTNAME = "immich_redis";
+            DB_DATABASE_NAME = db_name;
+            
+            REDIS_HOSTNAME = "10.89.0.1";
           };
           extraOptions = [
             "--network=immich-net"
+            "--device=/dev/dri:/dev/dri"
             # "--gpus=all"
 
             "-l=traefik.enable=true"
             "-l=traefik.http.routers.immich.rule=Host(`immich.${builtins.readFile config.sops.secrets.domain_name.path}`)"
-            "-l=traefik.http.services.immich.loadbalancer.server.port=2283"
+            "-l=traefik.http.services.immich.loadbalancer.server.url=http://10.89.0.1:2283"
             "-l=homepage.group=Media"
             "-l=homepage.name=Immich"
             "-l=homepage.icon=immich"
@@ -114,7 +130,7 @@ in {
           environment = {
             POSTGRES_USER = "postgres";
             POSTGRES_PASSWORD = "postgres";
-            POSTGRES_DB = "immich_postgres";
+            POSTGRES_DB = db_name;
           };
           extraOptions = [
             "--network=immich-net"
