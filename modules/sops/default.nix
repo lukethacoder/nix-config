@@ -35,6 +35,8 @@ in
       "navidrome/salt" = {};
       "lastfm/api_key" = {};
       "lastfm/api_secret" = {};
+      "immich/postgres_username" = {};
+      "immich/postgres_password" = {};
       samba_password = {};
     };
 

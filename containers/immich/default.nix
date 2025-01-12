@@ -80,8 +80,8 @@ in {
             
             # using '--network="immich-net"' means using the container name doesn't resolve correctly 
             DB_HOSTNAME = "10.89.0.1"; # "immich_postgres"
-            DB_USERNAME = "postgres";
-            DB_PASSWORD = "postgres";
+            DB_USERNAME = builtins.readFile config.sops.secrets."immich/postgres_username".path;
+            DB_PASSWORD = builtins.readFile config.sops.secrets."immich/postgres_password".path;
             DB_DATABASE_NAME = db_name;
             
             REDIS_HOSTNAME = "10.89.0.1";
@@ -128,8 +128,8 @@ in {
             "${vars.serviceConfigRoot}/immich/pgdata:/var/lib/postgresql/data"
           ];
           environment = {
-            POSTGRES_USER = "postgres";
-            POSTGRES_PASSWORD = "postgres";
+            POSTGRES_USER = builtins.readFile config.sops.secrets."immich/postgres_username".path;
+            POSTGRES_PASSWORD = builtins.readFile config.sops.secrets."immich/postgres_password".path;
             POSTGRES_DB = db_name;
           };
           extraOptions = [
