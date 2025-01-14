@@ -1,58 +1,33 @@
 { config, vars, pkgs, ... }:
 let 
+  immichVersion = "release";
+  immichPhotosDir = "${vars.mainArray}/Photos/immich";
+  immichRootDir = "${vars.serviceConfigRoot}/immich";
+
+  dbName = "immich";
+  dbHostName = "immich_db";
+  redisHostName = "immich_redis";
+  dbDir = "${immichRootDir}/db";
+
   directories = [
-    "${vars.serviceConfigRoot}/immich"
-    "${vars.serviceConfigRoot}/immich/config"
-    "${vars.mainArray}/Photos/immich"
-    "${vars.mainArray}/Photos/immich/encoded-video"
+    immichRootDir
+    immichPhotosDir
   ];
-  db_name = "immich";
-in {
-
-  # users = {
-  #   groups.share = {
-  #     gid = 993;
-  #   };
-  #   users.share = {
-  #     uid = 994;
-  #     isSystemUser = true;
-  #     group = "share";
-  #   };
-  # };
-
-  system.userActivationScripts.immich-data.text = ''
-    mkdir -p ${vars.serviceConfigRoot}/immich \
-      ${vars.serviceConfigRoot}/immich/config \
-      ${vars.serviceConfigRoot}/immich/pgdata \
-      ${vars.mainArray}/Photos/immich \
-      ${vars.mainArray}/Photos/immich/encoded-video
-  '';
-
-  # # not ideal, but doesn't seem to let windows have write access without 0777 :(
-  # system.activationScripts.giveImmichShareUserAccessToFolders = 
-  #   let
-  #     user = config.users.users.share.name;
-  #     group = config.users.users.share.group;
-  #   in
-  #     ''
-  #       chown -R ${config.users.users.share.name}:${config.users.users.share.group} /mnt/user/Photos
-  #       chmod -R 0777 /mnt/user/Photos
-  #     '';
-  
+in {  
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
-  system.activationScripts.init-immich-network = let
-    backend = config.virtualisation.oci-containers.backend;
-    backendBin = "${pkgs.${backend}}/bin/${backend}";
-  in ''
-      # immich-net network
-      check=$(${backendBin} network ls | grep "immich-net" || true)
-      if [ -z "$check" ]; then
-        ${backendBin} network create immich-net
-      else
-        echo "immich-net already exists in docker"
-      fi
-  '';
+  # system.activationScripts.init-immich-network = let
+  #   backend = config.virtualisation.oci-containers.backend;
+  #   backendBin = "${pkgs.${backend}}/bin/${backend}";
+  # in ''
+  #     # immich-net network
+  #     check=$(${backendBin} network ls | grep "immich-net" || true)
+  #     if [ -z "$check" ]; then
+  #       ${backendBin} network create immich-net
+  #     else
+  #       echo "immich-net already exists in docker"
+  #     fi
+  # '';
 
   # Keep redis from complaining
   boot.kernel.sysctl = {
@@ -63,37 +38,31 @@ in {
   virtualisation = {
     oci-containers = {
       containers = {
-        immich = {
+        immich_server = {
           autoStart = true;
-          image = "ghcr.io/imagegenius/immich:latest";
-          volumes = [
-            "${vars.serviceConfigRoot}/immich/config:/config"
-            "${vars.serviceConfigRoot}/immich/config/machine-learning:/config/machine-learning"
-            "${vars.mainArray}/Photos/immich:/photos"
-            "${vars.mainArray}/Photos/immich/encoded-video/.immich:/photos/encoded-video/.immich"
+          image = "ghcr.io/immich-app/immich-server:${immichVersion}";
+          ports = [
+            "2283:2283"
           ];
-          ports = [ "2283:8080" ];
+          volumes = [
+            "${immichPhotosDir}:/usr/src/app/upload"
+            "/etc/localtime:/etc/localtime:ro"
+          ];
           environment = {
-            PUID = "0";
-            PGID = "0";
-            TZ = config.sops.secrets.time_zone.path;
-            
-            # using '--network="immich-net"' means using the container name doesn't resolve correctly 
-            DB_HOSTNAME = "10.89.0.1"; # "immich_postgres"
+            IMMICH_VERSION = immichVersion;
+            DB_HOSTNAME = dbHostName;
+            REDIS_HOSTNAME = redisHostName;
             DB_USERNAME = builtins.readFile config.sops.secrets."immich/postgres_username".path;
             DB_PASSWORD = builtins.readFile config.sops.secrets."immich/postgres_password".path;
-            DB_DATABASE_NAME = db_name;
-            
-            REDIS_HOSTNAME = "10.89.0.1";
+            DB_DATABASE_NAME = dbName;
           };
           extraOptions = [
-            "--network=immich-net"
+            # "--network=immich-net"
             "--device=/dev/dri:/dev/dri"
-            # "--gpus=all"
 
             "-l=traefik.enable=true"
             "-l=traefik.http.routers.immich.rule=Host(`immich.${builtins.readFile config.sops.secrets.domain_name.path}`)"
-            "-l=traefik.http.services.immich.loadbalancer.server.url=http://10.89.0.1:2283"
+            "-l=traefik.http.services.immich.loadbalancer.server.port=2283"
             "-l=homepage.group=Media"
             "-l=homepage.name=Immich"
             "-l=homepage.icon=immich"
@@ -104,36 +73,49 @@ in {
             "-l=homepage.widget.key=${builtins.readFile config.sops.secrets."immich/api_key".path}"
             "-l=homepage.widget.version=2"
           ];
+          dependsOn = [
+            "immich_redis"
+            "immich_db"
+          ];
         };
-
+        # NOTE: this container name must match in Machine Learning settings (e.g. "http://immich_machine_learning:3003")
+        immich_machine_learning = {
+          image = "ghcr.io/immich-app/immich-machine-learning:${immichVersion}";
+          ports = [
+            "3003:3003"
+          ];
+          volumes = [
+            "${immichRootDir}/model-cache:/cache"
+          ];
+          environment = {
+            IMMICH_VERSION = immichVersion;
+          };
+          extraOptions = [
+            "--pull=newer"
+            "--device=/dev/dri:/dev/dri"
+          ];
+        };
         immich_redis = {
-          autoStart = true;
           image = "redis";
           ports = [
             "6379:6379"
           ];
-          extraOptions = [
-            "--network=immich-net"
-          ];
         };
 
-        immich_postgres = {
+        immich_db = {
           autoStart = true;
-          image = "tensorchord/pgvecto-rs:pg16-v0.2.1";
+          image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
           ports = [
             "5432:5432"
           ];
           volumes = [
-            "${vars.serviceConfigRoot}/immich/pgdata:/var/lib/postgresql/data"
+            "${dbDir}:/var/lib/postgresql/data"
           ];
           environment = {
             POSTGRES_USER = builtins.readFile config.sops.secrets."immich/postgres_username".path;
             POSTGRES_PASSWORD = builtins.readFile config.sops.secrets."immich/postgres_password".path;
-            POSTGRES_DB = db_name;
+            POSTGRES_DB = dbName;
           };
-          extraOptions = [
-            "--network=immich-net"
-          ];
         };
       };
     };
