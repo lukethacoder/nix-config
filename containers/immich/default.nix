@@ -12,6 +12,7 @@ let
   directories = [
     immichRootDir
     immichPhotosDir
+    "${vars.mainArray}/Photos"
   ];
 in {  
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
@@ -47,6 +48,8 @@ in {
           volumes = [
             "${immichPhotosDir}:/usr/src/app/upload"
             "/etc/localtime:/etc/localtime:ro"
+            # External Libraries
+            "${vars.mainArray}/Photos:/Photos"
           ];
           environment = {
             IMMICH_VERSION = immichVersion;
