@@ -1,12 +1,34 @@
 # NixOS
 
-> NOTE: this NixOS config is not currently working and is a work in progress. Take anything in this repo with a grain of salt (for now).
+> NOTE: this NixOS config is still a work in progress. Take anything in this repo with a grain of salt (for now).
+
+## Services
+
+- Tailscale
+- Traefik
+- sops
+- Navidrome
+- Jellyfin
+- Immich
+- DuckDNS
+- Deluge/Gluetun
 
 ## Machines
 
 ### Opslag
 
 Main Home Server machine. Will eventually host some sort of MergerFS/SnapRaid setup as well as a few services like Jellyfin, Navidrome, PiHole etc.
+
+### Hoofd (Daily driver laptop)
+
+Will eventually have a laptop configured with NixOS as a daily driver. Not yet ready to take the leap.
+
+Will host a simple config with:
+- Codium
+- Thorium (Chromium based browser)
+- Floorp (Firefox based browser)
+- Other DX tools + languages (Node (nvm), Rust, Python, etc.)
+- 
 
 ## Setup
 
@@ -54,15 +76,3 @@ sudo nixos-install --root /mnt --flake '/mnt/etc/nixos#opslag'
 sudo reboot
 ```
 
-
-## TODO
-
-- [ ] Setup SSH
-- [ ] Disko Configuration
-- [ ] Test Disk recovery
-- [ ] Containers (Jellyfin, Navidrome, etc.)
-- [ ] Modules
-    - [ ] DuckDNS
-    - [ ] Tailscale
-    - [ ] WireGuard
-    - [ ] Pi-Hole
