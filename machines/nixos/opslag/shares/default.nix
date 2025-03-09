@@ -3,6 +3,7 @@ let
   smb = {
     share_list = {
       Media = { path = "/mnt/user/Media"; };
+      Photos = { path = "/mnt/user/Photos"; };
     };
     share_params = {
       "browsable" = "yes";
@@ -104,5 +105,7 @@ in
       ''
         chown -R ${user}:${group} /mnt/user/Media
         chmod -R 0777 /mnt/user/Media
+        chown -R ${user}:${group} /mnt/user/Photos
+        chmod -R 0777 /mnt/user/Photos
       '';
 }
