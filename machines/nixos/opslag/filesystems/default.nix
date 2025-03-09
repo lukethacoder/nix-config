@@ -94,7 +94,7 @@
       # They can be in the disks used for data, parity or boot,
       # but each file must be in a different disk.
       # Format: "content FILE_PATH"
-      "/var/snapraid.content"
+      "/persist/snapraid/snapraid.content"
       "/mnt/parity1/.snapraid.content"
       "/mnt/data1/.snapraid.content"
       "/mnt/data2/.snapraid.content"
@@ -126,6 +126,9 @@
       "*.!sync"
       ".DS_Store"
       "._.DS_Store"
+      "/Media/TV/"
+      "/Media/Movies/"
+      "/Photos/immich/thumbs/"
       ".Thumbs.db"
       ".fseventsd"
       ".Spotlight-V100"
@@ -134,7 +137,25 @@
     ];
   };
 
-  # Give user access to the MergerFS mount
+  services.smartd = {
+    enable = true;
+    defaults.autodetected = "-a -o on -S on -s (S/../.././02|L/../../6/03) -n standby,q";
+    notifications = {
+      wall = {
+        enable = true;
+      };
+      mail = {
+        enable = true;
+        sender = builtins.readFile config.sops.secrets.email_address.path;
+        recipient = builtins.readFile config.sops.secrets.email_address.path;
+      };
+    };
+  };
+
+  # Give user access to: 
+  # - MergerFS mount
+  # - boot drive snapraid dir
+  # - parity disk(s)
   system.activationScripts.giveUserAccessToDataDisk = 
     let
       user = config.users.users.luke.name;
@@ -142,5 +163,7 @@
     in
       ''
         chown -R ${user}:${group} ${vars.mainArray}
+        chown -R ${user}:${group} /mnt/parity1
+        chown -R ${user}:${group} /persist/snapraid
       '';
 }
