@@ -38,14 +38,13 @@
     fsType = "xfs";
   };
 
-  # Parity Disks
-  fileSystems."/mnt/parity1" = {
-    device = "/dev/disk/by-partlabel/disk-parity1-parity";
-    fsType = "xfs";
-  };
-
   # MergerFS
   fileSystems.${vars.mainArray} = {
+    depends = [
+      "/mnt/data1"
+      "/mnt/data2"
+      "/mnt/data3"
+    ];
     device = "/mnt/data*";
     options = [
       "defaults"
@@ -62,7 +61,78 @@
     fsType = "fuse.mergerfs";
   };
 
+  # Parity Disks
+  fileSystems."/mnt/parity1" = {
+    depends = [
+      vars.mainArray
+    ];
+    device = "/dev/disk/by-partlabel/disk-parity1-parity";
+    fsType = "xfs";
+  };
+
   swapDevices = [ ];
+
+  services.snapraid = {
+    enable = true;
+    # extraConfig = ''
+    #   nohidden
+    #   blocksize 256
+    #   hashsize 16
+    #   autosave 500
+    #   pool /pool
+    # '';
+    parityFiles = [
+      # Defines the file(s) to use as parity storage
+      # It must NOT be in a data disk
+      # Format: "FILE_PATH"
+      "/mnt/parity1/snapraid.parity"
+    ];
+    contentFiles = [
+      # Defines the files to use as content list.
+      # You can use multiple specification to store more copies.
+      # You must have at least one copy for each parity file plus one. Some more don't hurt.
+      # They can be in the disks used for data, parity or boot,
+      # but each file must be in a different disk.
+      # Format: "content FILE_PATH"
+      "/var/snapraid.content"
+      "/mnt/parity01/.snapraid.content"
+      "/mnt/data1/.snapraid.content"
+      "/mnt/data2/.snapraid.content"
+      "/mnt/data3/.snapraid.content"
+    ];
+    dataDisks = {
+      # Defines the data disks to use
+      # The order is relevant for parity, do not change it
+      # Format: "DISK_NAME DISK_MOUNT_POINT"
+      d01 = "/mnt/data1/";
+      d02 = "/mnt/data2/";
+      d03 = "/mnt/data3/";
+    };
+    # touchBeforeSync = true; # Whether `snapraid touch` should be run before `snapraid sync`
+    sync.interval = "03:00";
+    scrub.interval = "weekly";
+    # scrub.plan = 8 # Percent of the array that should be checked by `snapraid scrub`.
+    # scrub.olderThan = 10; # Number of days since data was last scrubbed before it can be scrubbed again.
+    exclude = [
+      # Define files and directories to exclude
+      # Remember that all the paths are relative at the mount points
+      # Format: "FILE"
+      # Format: "DIR/"
+      # Format: "/PATH/FILE"
+      # Format: "PATH/DIR/"
+      "*.unrecoverable"
+      "/tmp/"
+      "/lost+found/"
+      "*.!sync"
+      ".DS_Store"
+      "._.DS_Store"
+      ".Thumbs.db"
+      ".fseventsd"
+      ".Spotlight-V100"
+      ".TemporaryItems"
+      ".Trashes"
+    ];
+  };
 
   # Give user access to the MergerFS mount
   system.activationScripts.giveUserAccessToDataDisk = 
