@@ -95,7 +95,7 @@
       # but each file must be in a different disk.
       # Format: "content FILE_PATH"
       "/var/snapraid.content"
-      "/mnt/parity01/.snapraid.content"
+      "/mnt/parity1/.snapraid.content"
       "/mnt/data1/.snapraid.content"
       "/mnt/data2/.snapraid.content"
       "/mnt/data3/.snapraid.content"
