@@ -17,7 +17,7 @@ in {
   virtualisation.oci-containers = {
     containers = {
       navidrome = {
-        image = "deluan/navidrome:latest";
+        image = "deluan/navidrome:0.55.0";
         autoStart = true;
         ports = [ "4533:4533" ];
         volumes = [
@@ -37,6 +37,7 @@ in {
           ND_LASTFM_SECRET = builtins.readFile config.sops.secrets."lastfm/api_secret".path;
         };
         extraOptions = [
+          "--pull=newer"
           "-l=traefik.enable=true"
           "-l=traefik.http.routers.navidrome.rule=Host(`navidrome.${builtins.readFile config.sops.secrets.domain_name.path}`)"
           "-l=traefik.http.services.navidrome.loadbalancer.server.port=4533"
@@ -54,7 +55,7 @@ in {
       };
       # Separate instance purely for DJ Mixes
       navidrome_mixes = {
-        image = "deluan/navidrome:latest";
+        image = "deluan/navidrome:0.55.0";
         autoStart = true;
         ports = [ "4534:4533" ];
         volumes = [
@@ -74,6 +75,7 @@ in {
           ND_LASTFM_SECRET = builtins.readFile config.sops.secrets."lastfm/api_secret".path;
         };
         extraOptions = [
+          "--pull=newer"
           "-l=traefik.enable=true"
           "-l=traefik.http.routers.navidromemixes.rule=Host(`mixes.${builtins.readFile config.sops.secrets.domain_name.path}`)"
           "-l=traefik.http.services.navidromemixes.loadbalancer.server.port=4533"
