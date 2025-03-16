@@ -27,8 +27,8 @@ in
       "wireguard/public_key" = {};
       "wireguard/private_key" = {};
       "wireguard/addresses" = {};
-      # "adguard/username" = {};
-      # "adguard/password" = {};
+      "adguard/username" = {};
+      "adguard/password" = {};
       "jellyfin/api_key" = {};
       "navidrome/username" = {};
       "navidrome/token" = {};
