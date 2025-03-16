@@ -35,11 +35,6 @@
     };
   };
 
-  # Copy local deluge.conf to act as the core.conf for the container
-  home.file = {
-    "${specialArgs.vars.serviceConfigRoot}/deluge/deluge.conf".source = ./deluge.conf;
-  };
-
   programs.gpg.enable = true;
   services.gpg-agent = {
     enable = true;

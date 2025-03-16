@@ -3,20 +3,52 @@ let
   directories = [
     "${vars.serviceConfigRoot}/deluge/config"
     "${vars.serviceConfigRoot}/gluetun"
-    "${vars.serviceConfigRoot}/sabnzbd"
-    "${vars.serviceConfigRoot}/radarr"
-    "${vars.serviceConfigRoot}/prowlarr"
-    "${vars.serviceConfigRoot}/recyclarr"
+    # "${vars.serviceConfigRoot}/sabnzbd"
+    # "${vars.serviceConfigRoot}/radarr"
+    # "${vars.serviceConfigRoot}/prowlarr"
+    # "${vars.serviceConfigRoot}/recyclarr"
     "${vars.mainArray}/Media/Downloads"
     "${vars.serviceConfigRoot}/Downloads.tmp"
+    "${vars.serviceConfigRoot}/Downloads"
   ];
 in
 {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
+  # Copy local deluge.conf to act as the core.conf for the container
+  # home.file = {
+  #   "${specialArgs.vars.serviceConfigRoot}/deluge/deluge.conf".source = ./deluge.conf;
+  # };
+  
+  systemd.services.deluge-copy-config = {
+    description = "Copy deluge.conf before container is started";
+    before = [
+      "docker.service"
+      "podman.service"
+    ];
+    wantedBy = [
+      "docker.service"
+      "podman.service"
+    ];
+    serviceConfig = {
+      Type = "oneshot";
+      # Allow the service to be restarted without error
+      RemainAfterExit = true;
+    };
+    script = ''
+      mkdir -p ${vars.serviceConfigRoot}/deluge/
+      if cp ${builtins.path { path = ./deluge.conf; }} ${vars.serviceConfigRoot}/deluge/deluge.conf; then
+        echo "Config file copied successfully."
+      else
+        echo "Error copying deluge config file."
+        exit 1
+      fi
+    '';
+  };
+
   virtualisation.oci-containers = {
     containers = {
-      deluge = {
+      deluge_container = {
         image = "linuxserver/deluge:latest";
         autoStart = true;
         dependsOn = [
@@ -35,7 +67,7 @@ in
           "-l=homepage.widget.url=http://gluetun:8112"
         ];
         volumes = [
-          "${vars.mainArray}/Media/Downloads:/data/completed"
+          "${vars.serviceConfigRoot}/Downloads:/data/completed"
           "${vars.serviceConfigRoot}/Downloads.tmp:/data/incomplete"
           "${vars.serviceConfigRoot}/deluge/config:/config"
           "${vars.serviceConfigRoot}/deluge/deluge.conf:/config/core.conf"
@@ -87,4 +119,15 @@ in
       };
     };
   };
+
+  system.activationScripts.giveUserAccessToDelugeDir = 
+    let
+      user = config.users.users.luke.name;
+      group = config.users.users.luke.group;
+    in
+      ''
+        chown -R ${user}:${group} ${vars.serviceConfigRoot}/deluge/config
+        chown -R ${user}:${group} ${vars.mainArray}/Media/Downloads
+        chown -R ${user}:${group} ${vars.serviceConfigRoot}/Downloads.tmp
+      '';
 }
