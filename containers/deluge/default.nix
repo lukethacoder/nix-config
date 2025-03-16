@@ -7,7 +7,6 @@ let
     # "${vars.serviceConfigRoot}/radarr"
     # "${vars.serviceConfigRoot}/prowlarr"
     # "${vars.serviceConfigRoot}/recyclarr"
-    "${vars.mainArray}/Media/Downloads"
     "${vars.serviceConfigRoot}/Downloads.tmp"
     "${vars.serviceConfigRoot}/Downloads"
   ];
@@ -48,7 +47,7 @@ in
 
   virtualisation.oci-containers = {
     containers = {
-      deluge_container = {
+      deluge = {
         image = "linuxserver/deluge:latest";
         autoStart = true;
         dependsOn = [
@@ -70,7 +69,7 @@ in
           "${vars.serviceConfigRoot}/Downloads:/data/completed"
           "${vars.serviceConfigRoot}/Downloads.tmp:/data/incomplete"
           "${vars.serviceConfigRoot}/deluge/config:/config"
-          "${vars.serviceConfigRoot}/deluge/deluge.conf:/config/core.conf"
+          "${vars.serviceConfigRoot}/deluge/config/deluge.conf:/config/core.conf"
         ];
         environment = {
           TZ = vars.timeZone;
@@ -127,7 +126,7 @@ in
     in
       ''
         chown -R ${user}:${group} ${vars.serviceConfigRoot}/deluge/config
-        chown -R ${user}:${group} ${vars.mainArray}/Media/Downloads
+        chown -R ${user}:${group} ${vars.serviceConfigRoot}/Downloads
         chown -R ${user}:${group} ${vars.serviceConfigRoot}/Downloads.tmp
       '';
 }
