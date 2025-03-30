@@ -31,26 +31,29 @@ in {
           ND_SCANSCHEDULE = "1h";
           ND_LOGLEVEL = "info";
           ND_SESSIONTIMEOUT = "24h";
-          ND_BASEURL = "http://navidrome.${builtins.readFile config.sops.secrets.domain_name.path}";
+          ND_BASEURL = "http://navidrome.${vars.domainName}";
           ND_LASTFM_ENABLED = "true";
-          ND_LASTFM_APIKEY = builtins.readFile config.sops.secrets."lastfm/api_key".path;
-          ND_LASTFM_SECRET = builtins.readFile config.sops.secrets."lastfm/api_secret".path;
+          # ND_LASTFM_APIKEY = config.sops.secrets."lastfm/api_key".path;
+          # ND_LASTFM_SECRET = config.sops.secrets."lastfm/api_secret".path;
         };
+        environmentFiles = [
+          config.sops.templates."navidrome-env".path
+        ];
         extraOptions = [
           "--pull=newer"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.navidrome.rule=Host(`navidrome.${builtins.readFile config.sops.secrets.domain_name.path}`)"
+          "-l=traefik.http.routers.navidrome.rule=Host(`navidrome.${vars.domainName}`)"
           "-l=traefik.http.services.navidrome.loadbalancer.server.port=4533"
           "-l=homepage.group=Media"
           "-l=homepage.name=Navidrome"
           "-l=homepage.icon=navidrome.svg"
-          "-l=homepage.href=https://navidrome.${builtins.readFile config.sops.secrets.domain_name.path}"
+          "-l=homepage.href=https://navidrome.${vars.domainName}"
           "-l=homepage.description=Media player"
           "-l=homepage.widget.type=navidrome"
           "-l=homepage.widget.user={{HOMEPAGE_FILE_NAVIDROME_USERNAME}}"
           "-l=homepage.widget.token={{HOMEPAGE_FILE_NAVIDROME_TOKEN}}"
           "-l=homepage.widget.salt={{HOMEPAGE_FILE_NAVIDROME_SALT}}"
-          "-l=homepage.widget.url=https://navidrome.${builtins.readFile config.sops.secrets.domain_name.path}"
+          "-l=homepage.widget.url=https://navidrome.${vars.domainName}"
         ];
       };
       # Separate instance purely for DJ Mixes
@@ -69,26 +72,29 @@ in {
           ND_SCANSCHEDULE = "1h";
           ND_LOGLEVEL = "info";
           ND_SESSIONTIMEOUT = "24h";
-          ND_BASEURL = "http://mixes.${builtins.readFile config.sops.secrets.domain_name.path}";
+          ND_BASEURL = "http://mixes.${vars.domainName}";
           ND_LASTFM_ENABLED = "true";
-          ND_LASTFM_APIKEY = builtins.readFile config.sops.secrets."lastfm/api_key".path;
-          ND_LASTFM_SECRET = builtins.readFile config.sops.secrets."lastfm/api_secret".path;
+          # ND_LASTFM_APIKEY = config.sops.secrets."lastfm/api_key".path;
+          # ND_LASTFM_SECRET = config.sops.secrets."lastfm/api_secret".path;
         };
+        environmentFiles = [
+          config.sops.templates."navidrome-env".path
+        ];
         extraOptions = [
           "--pull=newer"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.navidromemixes.rule=Host(`mixes.${builtins.readFile config.sops.secrets.domain_name.path}`)"
+          "-l=traefik.http.routers.navidromemixes.rule=Host(`mixes.${vars.domainName}`)"
           "-l=traefik.http.services.navidromemixes.loadbalancer.server.port=4533"
           "-l=homepage.group=Media"
           "-l=homepage.name=Navidrome Mixes"
           "-l=homepage.icon=https://simpleicons.org/icons/pioneerdj.svg"
-          "-l=homepage.href=https://mixes.${builtins.readFile config.sops.secrets.domain_name.path}"
+          "-l=homepage.href=https://mixes.${vars.domainName}"
           "-l=homepage.description=Media player"
           "-l=homepage.widget.type=navidrome"
           "-l=homepage.widget.user={{HOMEPAGE_FILE_NAVIDROME_USERNAME}}"
           "-l=homepage.widget.token={{HOMEPAGE_FILE_NAVIDROME_TOKEN}}"
           "-l=homepage.widget.salt={{HOMEPAGE_FILE_NAVIDROME_SALT}}"
-          "-l=homepage.widget.url=https://mixes.${builtins.readFile config.sops.secrets.domain_name.path}"
+          "-l=homepage.widget.url=https://mixes.${vars.domainName}"
         ];
       };
     };
