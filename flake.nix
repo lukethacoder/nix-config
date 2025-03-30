@@ -2,13 +2,13 @@
   description = "noob NixOS Flake Configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOs/nixpkgs/release-24.05";
+    nixpkgs.url = "github:NixOs/nixpkgs/release-24.11";
     
     # disko.url = "github:nix-community/disko";
     # disko.inputs.nixpkgs.follows = "nixpkgs";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.05";
+      url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -34,18 +34,18 @@
   }@inputs:
     let
       system = "x86_64-linux";
-      overlays = [
-        (self: super: {
-          go = super.go_1_24;
-        })
-        # (final: prev: {
-        #   # override go version to fix sops-nix issue?
-        #   go = final.pkgs.go_1_24;
-        #   sops-install-secrets = prev.sops-install-secrets.overrideAttrs (oldAttrs: {
-        #     buildInputs = (oldAttrs.buildInputs or []) ++ [ final.pkgs.go_1_24 ];
-        #   });
-        # })
-      ];
+      # overlays = [
+      #   (self: super: {
+      #     go = super.go_1_24;
+      #   })
+      #   # (final: prev: {
+      #   #   # override go version to fix sops-nix issue?
+      #   #   go = final.pkgs.go_1_24;
+      #   #   sops-install-secrets = prev.sops-install-secrets.overrideAttrs (oldAttrs: {
+      #   #     buildInputs = (oldAttrs.buildInputs or []) ++ [ final.pkgs.go_1_24 ];
+      #   #   });
+      #   # })
+      # ];
       # overlays = [
       #   (final: prev: {
       #     sops-install-secrets = prev.sops-install-secrets.overrideAttrs (oldAttrs: {
@@ -58,6 +58,9 @@
         # inherit overlays;
       };
     in {
+      nix.extraOptions = ''
+        plugin-files = ${pkgs.nix-plugins}/lib/nix/plugins
+      '';
       nixosConfigurations = {
         opslag = nixpkgs.lib.nixosSystem {
           inherit system;
@@ -113,16 +116,7 @@
               home-manager.backupFileExtension = "bak";
             }
           ];
-          # pkgs = pkgs.extend (final: prev: {
-          #   inherit (prev.extend (final': prev': { inherit (overlays) sops-install-secrets; })) sops-install-secrets;
-          #   config = {
-          #     allowAliases = true;
-          #     allowUnfree = true;
-          #     allowUnfreePredicate = pkg: pkg.name == "1password-cli";
-          #   };
-          # });
         };
       };
-      # packages.${system} = { inherit pkgs; };
     };
 }
