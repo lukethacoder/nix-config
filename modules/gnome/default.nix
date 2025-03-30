@@ -6,7 +6,7 @@
     gnome-tour
     # gedit # Text Editor
     gnome-text-editor # Text Editor
-  ]) ++ (with pkgs.gnome; [
+  ]) ++ (with pkgs; [
     gnome-calendar
     gnome-contacts
     gnome-music
