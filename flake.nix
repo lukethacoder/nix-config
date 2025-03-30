@@ -29,18 +29,45 @@
     nixpkgs,
     # disko,
     home-manager,
+    sops-nix,
     ...
   }@inputs:
-    {
+    let
+      system = "x86_64-linux";
+      overlays = [
+        (self: super: {
+          go = super.go_1_24;
+        })
+        # (final: prev: {
+        #   # override go version to fix sops-nix issue?
+        #   go = final.pkgs.go_1_24;
+        #   sops-install-secrets = prev.sops-install-secrets.overrideAttrs (oldAttrs: {
+        #     buildInputs = (oldAttrs.buildInputs or []) ++ [ final.pkgs.go_1_24 ];
+        #   });
+        # })
+      ];
+      # overlays = [
+      #   (final: prev: {
+      #     sops-install-secrets = prev.sops-install-secrets.overrideAttrs (oldAttrs: {
+      #       buildInputs = (oldAttrs.buildInputs or []) ++ [ final.pkgs.go_1_23 ];
+      #     });
+      #   })
+      # ];
+      pkgs = import nixpkgs {
+        inherit system;
+        # inherit overlays;
+      };
+    in {
       nixosConfigurations = {
         opslag = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
+          inherit system;
           specialArgs = {
             inherit inputs;
             vars = import ./machines/nixos/vars.nix;
           };
           modules = [
             # Base configuration and modules
+            ./modules/system
             ./modules/sops
             ./modules/tailscale
             ./modules/fonts
@@ -57,15 +84,16 @@
             ./machines/nixos/opslag
 
             # Services and applications
-            ./containers/homepage
-            ./containers/traefik
-            ./containers/deluge
-            ./containers/grafana
+            # ./containers/homepage
+            # ./containers/traefik
+            # ./containers/deluge
+            # ./containers/grafana
+            # ./containers/jellyfin
+            # ./containers/navidrome
+            # ./containers/immich
+
             # ./containers/adguard
             # ./containers/syncthing
-            ./containers/jellyfin
-            ./containers/navidrome
-            ./containers/immich
 
             # Users
             ./users/luke
@@ -85,7 +113,16 @@
               home-manager.backupFileExtension = "bak";
             }
           ];
+          # pkgs = pkgs.extend (final: prev: {
+          #   inherit (prev.extend (final': prev': { inherit (overlays) sops-install-secrets; })) sops-install-secrets;
+          #   config = {
+          #     allowAliases = true;
+          #     allowUnfree = true;
+          #     allowUnfreePredicate = pkg: pkg.name == "1password-cli";
+          #   };
+          # });
         };
       };
+      # packages.${system} = { inherit pkgs; };
     };
 }
