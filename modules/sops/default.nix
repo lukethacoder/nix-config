@@ -54,9 +54,24 @@ in
 
     templates = {
       "domainName".content = ''${config.sops.placeholder.domain_name}'';
+      "immich-env".content = ''
+        DB_USERNAME=${config.sops.placeholder."immich/postgres_username"}
+        DB_PASSWORD=${config.sops.placeholder."immich/postgres_password"}
+        POSTGRES_USER=${config.sops.placeholder."immich/postgres_username"}
+        POSTGRES_PASSWORD=${config.sops.placeholder."immich/postgres_password"}
+        IMMICH_API_KEY=${config.sops.placeholder."immich/api_key"}
+      '';
       "navidrome-env".content = ''
         ND_LASTFM_APIKEY=${config.sops.placeholder."lastfm/api_key"}
         ND_LASTFM_SECRET=${config.sops.placeholder."lastfm/api_secret"}
+      '';
+      "wireguard-env".content = ''
+        WIREGUARD_ENDPOINT_IP=${config.sops.placeholder."wireguard/endpoint_ip"}
+        WIREGUARD_ENDPOINT_PORT=${config.sops.placeholder."wireguard/endpoint_port"}
+        WIREGUARD_PUBLIC_KEY=${config.sops.placeholder."wireguard/public_key"}
+        WIREGUARD_PRIVATE_KEY=${config.sops.placeholder."wireguard/private_key"}
+        WIREGUARD_ADDRESSES=${config.sops.placeholder."wireguard/addresses"}
+        # WIREGUARD_ADDRESSES="10.13.91.97/24"
       '';
     };
   };
@@ -68,7 +83,6 @@ in
       group = config.users.users.luke.group;
     in
       ''
-        echo "navidrome-env: ${config.sops.templates."navidrome-env".path}"
         mkdir -p ${ageFolder} || true
         chown -R ${user}:${group} ${homeDirectory}/.config
       '';

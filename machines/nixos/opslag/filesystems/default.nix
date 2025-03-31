@@ -144,11 +144,11 @@
       wall = {
         enable = true;
       };
-      mail = {
-        enable = true;
-        sender = builtins.readFile config.sops.secrets.email_address.path;
-        recipient = builtins.readFile config.sops.secrets.email_address.path;
-      };
+      # mail = {
+      #   enable = true;
+      #   sender = builtins.readFile config.sops.secrets.email_address.path;
+      #   recipient = builtins.readFile config.sops.secrets.email_address.path;
+      # };
     };
   };
 

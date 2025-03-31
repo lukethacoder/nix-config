@@ -59,7 +59,8 @@
   environment.systemPackages = with pkgs; [
     starship
     neofetch
-    cinnamon.nemo-with-extensions
+    nemo-with-extensions
+    nix-plugins
     sops
     age
   ];

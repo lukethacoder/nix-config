@@ -1,9 +1,12 @@
 { config, vars, pkgs, ... }:
-let directories = [
-  "${vars.serviceConfigRoot}/jellyfin"
-  "${vars.mainArray}/Media/TV"
-  "${vars.mainArray}/Media/Movies"
-];
+let 
+  directories = [
+    "${vars.serviceConfigRoot}/jellyfin"
+    "${vars.mainArray}/Media/TV"
+    "${vars.mainArray}/Media/Movies"
+  ];
+  # adjust to bump the version when required
+  jellyfinVersion = "10.10.6";
 in {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
@@ -12,7 +15,7 @@ in {
       enableHybridCodec = true;
     };
   };
-  hardware.opengl = {
+  hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
       intel-media-driver
@@ -27,18 +30,18 @@ in {
   virtualisation.oci-containers = {
     containers = {
       jellyfin = {
-        image = "lscr.io/linuxserver/jellyfin";
+        image = "lscr.io/linuxserver/jellyfin:${jellyfinVersion}";
         autoStart = true;
         ports = [ "8096:8096" ];
         extraOptions = [
           "--device=/dev/dri:/dev/dri"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.jellyfin.rule=Host(`jellyfin.${builtins.readFile config.sops.secrets.domain_name.path}`)"
+          "-l=traefik.http.routers.jellyfin.rule=Host(`jellyfin.${vars.domainName}`)"
           "-l=traefik.http.services.jellyfin.loadbalancer.server.port=8096"
           "-l=homepage.group=Media"
           "-l=homepage.name=Jellyfin"
           "-l=homepage.icon=jellyfin.svg"
-          "-l=homepage.href=https://jellyfin.${builtins.readFile config.sops.secrets.domain_name.path}"
+          "-l=homepage.href=https://jellyfin.${vars.domainName}"
           "-l=homepage.description=Media player"
           "-l=homepage.widget.type=jellyfin"
           "-l=homepage.widget.key={{HOMEPAGE_FILE_JELLYFIN_KEY}}"
