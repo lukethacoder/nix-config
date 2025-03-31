@@ -1,6 +1,7 @@
 { config, vars, pkgs, ... }:
 let 
-  immichVersion = "release";
+  # adjust to bump the version when required
+  immichVersion = "v1.130.3";
   immichPhotosDir = "${vars.mainArray}/Photos/immich";
   immichRootDir = "${vars.serviceConfigRoot}/immich";
 
@@ -16,19 +17,6 @@ let
   ];
 in {  
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
-
-  # system.activationScripts.init-immich-network = let
-  #   backend = config.virtualisation.oci-containers.backend;
-  #   backendBin = "${pkgs.${backend}}/bin/${backend}";
-  # in ''
-  #     # immich-net network
-  #     check=$(${backendBin} network ls | grep "immich-net" || true)
-  #     if [ -z "$check" ]; then
-  #       ${backendBin} network create immich-net
-  #     else
-  #       echo "immich-net already exists in docker"
-  #     fi
-  # '';
 
   # Keep redis from complaining
   boot.kernel.sysctl = {
@@ -55,25 +43,26 @@ in {
             IMMICH_VERSION = immichVersion;
             DB_HOSTNAME = dbHostName;
             REDIS_HOSTNAME = redisHostName;
-            DB_USERNAME = builtins.readFile config.sops.secrets."immich/postgres_username".path;
-            DB_PASSWORD = builtins.readFile config.sops.secrets."immich/postgres_password".path;
             DB_DATABASE_NAME = dbName;
           };
+          environmentFiles = [
+            config.sops.templates."immich-env".path
+          ];
           extraOptions = [
             # "--network=immich-net"
             "--device=/dev/dri:/dev/dri"
 
             "-l=traefik.enable=true"
-            "-l=traefik.http.routers.immich.rule=Host(`immich.${builtins.readFile config.sops.secrets.domain_name.path}`)"
+            "-l=traefik.http.routers.immich.rule=Host(`immich.${vars.domainName}`)"
             "-l=traefik.http.services.immich.loadbalancer.server.port=2283"
             "-l=homepage.group=Media"
             "-l=homepage.name=Immich"
             "-l=homepage.icon=immich"
-            "-l=homepage.href=https://immich.${builtins.readFile config.sops.secrets.domain_name.path}"
+            "-l=homepage.href=https://immich.${vars.domainName}"
             "-l=homepage.description=Photo Sync"
             "-l=homepage.widget.type=immich"
-            "-l=homepage.widget.url=https://immich.${builtins.readFile config.sops.secrets.domain_name.path}"
-            "-l=homepage.widget.key=${builtins.readFile config.sops.secrets."immich/api_key".path}"
+            "-l=homepage.widget.url=https://immich.${vars.domainName}"
+            "-l=homepage.widget.key={{IMMICH_API_KEY}}"
             "-l=homepage.widget.version=2"
           ];
           dependsOn = [
@@ -115,8 +104,6 @@ in {
             "${dbDir}:/var/lib/postgresql/data"
           ];
           environment = {
-            POSTGRES_USER = builtins.readFile config.sops.secrets."immich/postgres_username".path;
-            POSTGRES_PASSWORD = builtins.readFile config.sops.secrets."immich/postgres_password".path;
             POSTGRES_DB = dbName;
           };
         };

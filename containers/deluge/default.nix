@@ -59,7 +59,7 @@ in
           "-l=homepage.group=Arr"
           "-l=homepage.name=Deluge"
           "-l=homepage.icon=deluge.svg"
-          "-l=homepage.href=https://deluge.${builtins.readFile config.sops.secrets.domain_name.path}"
+          "-l=homepage.href=https://deluge.${vars.domainName}"
           "-l=homepage.description=Torrent client"
           "-l=homepage.widget.type=deluge"
           "-l=homepage.widget.password=deluge"
@@ -86,13 +86,13 @@ in
           "--cap-add=NET_ADMIN"
           "--device=/dev/net/tun:/dev/net/tun"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.deluge.rule=Host(`deluge.${builtins.readFile config.sops.secrets.domain_name.path}`)"
+          "-l=traefik.http.routers.deluge.rule=Host(`deluge.${vars.domainName}`)"
           "-l=traefik.http.routers.deluge.service=deluge"
           "-l=traefik.http.services.deluge.loadbalancer.server.port=8112"
           "-l=homepage.group=Arr"
           "-l=homepage.name=Gluetun"
           "-l=homepage.icon=gluetun.svg"
-          "-l=homepage.href=https://deluge.${builtins.readFile config.sops.secrets.domain_name.path}"
+          "-l=homepage.href=https://deluge.${vars.domainName}"
           "-l=homepage.description=VPN killswitch"
           "-l=homepage.widget.type=gluetun"
           "-l=homepage.widget.url=http://gluetun:8000"
@@ -103,17 +103,20 @@ in
         volumes = [
           "${vars.serviceConfigRoot}/gluetun:/gluetun"
         ];
+        environmentFiles = [
+          config.sops.templates."wireguard-env".path
+        ];
         environment = {
           TZ = vars.timeZone;
           VPN_TYPE = "wireguard";
           VPN_SERVICE_PROVIDER = "custom";
           # I know, we shouldn't be using readFile here, but gluetun doesn't like parsing the paths
-          WIREGUARD_ENDPOINT_IP = builtins.readFile config.sops.secrets."wireguard/endpoint_ip".path;
-          WIREGUARD_ENDPOINT_PORT = builtins.readFile config.sops.secrets."wireguard/endpoint_port".path;
-          WIREGUARD_PUBLIC_KEY = builtins.readFile config.sops.secrets."wireguard/public_key".path;
-          WIREGUARD_PRIVATE_KEY = builtins.readFile config.sops.secrets."wireguard/private_key".path;
+          # WIREGUARD_ENDPOINT_IP = config.sops.secrets."wireguard/endpoint_ip".path;
+          # WIREGUARD_ENDPOINT_PORT = config.sops.secrets."wireguard/endpoint_port".path;
+          # WIREGUARD_PUBLIC_KEY = config.sops.secrets."wireguard/public_key".path;
+          # WIREGUARD_PRIVATE_KEY = config.sops.secrets."wireguard/private_key".path;
           # WIREGUARD_ADDRESSES = builtins.readFile config.sops.secrets."wireguard/addresses".path;
-          WIREGUARD_ADDRESSES = "10.13.91.97/24";
+          # WIREGUARD_ADDRESSES = "10.13.91.97/24";
         };
       };
     };

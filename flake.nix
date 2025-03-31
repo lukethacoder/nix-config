@@ -87,13 +87,13 @@
             ./machines/nixos/opslag
 
             # Services and applications
-            # ./containers/homepage
-            # ./containers/traefik
-            # ./containers/deluge
+            ./containers/homepage
+            ./containers/traefik
+            ./containers/deluge
             # ./containers/grafana
-            # ./containers/jellyfin
-            # ./containers/navidrome
-            # ./containers/immich
+            ./containers/jellyfin
+            ./containers/navidrome
+            ./containers/immich
 
             # ./containers/adguard
             # ./containers/syncthing

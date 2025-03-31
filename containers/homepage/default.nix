@@ -51,22 +51,22 @@ in {
         extraOptions = [
           "--pull=newer"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.homepage.rule=Host(`home.${builtins.readFile config.sops.secrets.domain_name.path}`)"
+          "-l=traefik.http.routers.homepage.rule=Host(`home.lukethacoder.duckdns.org`)"
           "-l=traefik.http.services.homepage.loadbalancer.server.port=3000"
 
           # Extra Services
 
           # AdGuard Home (Router)
-          "-l=homepage.group=Services"
-          "-l=homepage.name=AdGuard"
-          "-l=homepage.icon=adguard-home.svg"
-          "-l=homepage.href=http://192.168.8.1:3000"
-          "-l=homepage.description=DNS and Adblocking"
-          "-l=homepage.widget.url=http://192.168.8.1:3000"
-          "-l=homepage.widget.type=adguard"
-          "-l=homepage.widget.username=${builtins.readFile config.sops.secrets."adguard/username".path}"
-          "-l=homepage.widget.password=${builtins.readFile config.sops.secrets."adguard/password".path}"
-          "-l=homepage.widget.fields=['queries', 'blocked', 'filtered', 'latency']"
+          # "-l=homepage.group=Services"
+          # "-l=homepage.name=AdGuard"
+          # "-l=homepage.icon=adguard-home.svg"
+          # "-l=homepage.href=http://192.168.8.1:3000"
+          # "-l=homepage.description=DNS and Adblocking"
+          # "-l=homepage.widget.url=http://192.168.8.1:3000"
+          # "-l=homepage.widget.type=adguard"
+          # "-l=homepage.widget.username=${builtins.readFile config.sops.secrets."adguard/username".path}"
+          # "-l=homepage.widget.password=${builtins.readFile config.sops.secrets."adguard/password".path}"
+          # "-l=homepage.widget.fields=['queries', 'blocked', 'filtered', 'latency']"
         ];
         ports = [ "3000:3000" ];
         volumes = [
@@ -93,7 +93,8 @@ in {
           HOMEPAGE_FILE_NAVIDROME_USERNAME = "/app/config/navidrome-username.key";
           HOMEPAGE_FILE_NAVIDROME_TOKEN = "/app/config/navidrome-token.key";
           HOMEPAGE_FILE_NAVIDROME_SALT = "/app/config/navidrome-salt.key";
-          HOMEPAGE_ALLOWED_HOSTS = "home.${builtins.readFile config.sops.secrets.domain_name.path}";
+          HOMEPAGE_ALLOWED_HOSTS = "home.lukethacoder.duckdns.org";
+          # HOMEPAGE_ALLOWED_HOSTS = "home.${vars.domainName}";
         };
         # environmentFiles = [
         #   config.age.secrets.paperless.path
