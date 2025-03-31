@@ -62,7 +62,7 @@ in {
             "-l=homepage.description=Photo Sync"
             "-l=homepage.widget.type=immich"
             "-l=homepage.widget.url=https://immich.${vars.domainName}"
-            "-l=homepage.widget.key={{IMMICH_API_KEY}}"
+            "-l=homepage.widget.key={{HOMEPAGE_FILE_IMMICH_KEY}}"
             "-l=homepage.widget.version=2"
           ];
           dependsOn = [
