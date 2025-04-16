@@ -89,11 +89,13 @@
             # Services and applications
             ./containers/homepage
             ./containers/traefik
-            ./containers/deluge
+            # ./containers/deluge
+            ./containers/qbittorrent
             # ./containers/grafana
             ./containers/jellyfin
             ./containers/navidrome
             ./containers/immich
+            # ./containers/homeassistant
 
             # ./containers/adguard
             # ./containers/syncthing

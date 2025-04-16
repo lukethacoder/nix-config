@@ -40,6 +40,8 @@ in
       "wireguard/addresses" = {};
       "adguard/username" = {};
       "adguard/password" = {};
+      "qbittorrent/username" = {};
+      "qbittorrent/password" = {};
       "jellyfin/api_key" = {};
       "navidrome/username" = {};
       "navidrome/token" = {};
@@ -71,7 +73,6 @@ in
         WIREGUARD_PUBLIC_KEY=${config.sops.placeholder."wireguard/public_key"}
         WIREGUARD_PRIVATE_KEY=${config.sops.placeholder."wireguard/private_key"}
         WIREGUARD_ADDRESSES=${config.sops.placeholder."wireguard/addresses"}
-        # WIREGUARD_ADDRESSES="10.13.91.97/24"
       '';
     };
   };

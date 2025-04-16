@@ -14,37 +14,6 @@ in
 {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
-  # Copy local deluge.conf to act as the core.conf for the container
-  # home.file = {
-  #   "${specialArgs.vars.serviceConfigRoot}/deluge/deluge.conf".source = ./deluge.conf;
-  # };
-  
-  # systemd.services.deluge-copy-config = {
-  #   description = "Copy deluge.conf before container is started";
-  #   before = [
-  #     "docker.service"
-  #     "podman.service"
-  #   ];
-  #   wantedBy = [
-  #     "docker.service"
-  #     "podman.service"
-  #   ];
-  #   serviceConfig = {
-  #     Type = "oneshot";
-  #     # Allow the service to be restarted without error
-  #     RemainAfterExit = true;
-  #   };
-  #   script = ''
-  #     mkdir -p ${vars.serviceConfigRoot}/deluge/
-  #     if cp ${builtins.path { path = ./deluge.conf; }} ${vars.serviceConfigRoot}/deluge/deluge.conf; then
-  #       echo "Config file copied successfully."
-  #     else
-  #       echo "Error copying deluge config file."
-  #       exit 1
-  #     fi
-  #   '';
-  # };
-
   virtualisation.oci-containers = {
     containers = {
       qbittorrent = {
@@ -59,11 +28,11 @@ in
           "-l=homepage.group=Arr"
           "-l=homepage.name=qbittorrent"
           "-l=homepage.icon=qbittorrent.svg"
-          "-l=homepage.href=https://qbittorrent.${vars.domainName}"
+          "-l=homepage.href=https://torrent.${vars.domainName}"
           "-l=homepage.description=Torrent client"
           "-l=homepage.widget.type=qbittorrent"
-          "-l=homepage.widget.username=qbittorrent"
-          "-l=homepage.widget.password=qbittorrent"
+          "-l=homepage.widget.username={{HOMEPAGE_FILE_QBITTORRENT_USERNAME}}"
+          "-l=homepage.widget.password={{HOMEPAGE_FILE_QBITTORRENT_PASSWORD}}"
           "-l=homepage.widget.enableLeechProgress=true"
           "-l=homepage.widget.url=http://gluetun:8112"
         ];
@@ -72,9 +41,6 @@ in
           "${vars.serviceConfigRoot}/Downloads.tmp:/downloads"
           "${vars.serviceConfigRoot}/qbittorrent:/config"
         ];
-        # ports = [
-        #   "8112:8112"
-        # ];
         environment = {
           TZ = vars.timeZone;
           PUID = "994";
@@ -91,13 +57,13 @@ in
           "--cap-add=NET_ADMIN"
           "--device=/dev/net/tun:/dev/net/tun"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.deluge.rule=Host(`deluge.${vars.domainName}`)"
-          "-l=traefik.http.routers.deluge.service=deluge"
-          "-l=traefik.http.services.deluge.loadbalancer.server.port=8112"
+          "-l=traefik.http.routers.qbittorrent.rule=Host(`torrent.${vars.domainName}`)"
+          "-l=traefik.http.routers.qbittorrent.service=qbittorrent"
+          "-l=traefik.http.services.qbittorrent.loadbalancer.server.port=8112"
           "-l=homepage.group=Arr"
           "-l=homepage.name=Gluetun"
           "-l=homepage.icon=gluetun.svg"
-          "-l=homepage.href=https://deluge.${vars.domainName}"
+          "-l=homepage.href=https://torrent.${vars.domainName}"
           "-l=homepage.description=VPN killswitch"
           "-l=homepage.widget.type=gluetun"
           "-l=homepage.widget.url=http://gluetun:8000"
@@ -127,7 +93,7 @@ in
     };
   };
 
-  system.activationScripts.giveUserAccessToDelugeDir = 
+  system.activationScripts.giveUserAccessToQbittorrentDir = 
     let
       user = config.users.users.luke.name;
       group = config.users.users.luke.group;

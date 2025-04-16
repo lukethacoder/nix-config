@@ -87,6 +87,8 @@ in {
           "${config.sops.secrets."navidrome/username".path}:/app/config/navidrome-username.key"
           "${config.sops.secrets."navidrome/token".path}:/app/config/navidrome-token.key"
           "${config.sops.secrets."navidrome/salt".path}:/app/config/navidrome-salt.key"
+          "${config.sops.secrets."qbittorrent/username".path}:/app/config/qbittorrent-username.key"
+          "${config.sops.secrets."qbittorrent/password".path}:/app/config/qbittorrent-password.key"
         ];
         environment = {
           TZ = vars.timeZone;
@@ -98,6 +100,8 @@ in {
           HOMEPAGE_FILE_NAVIDROME_SALT = "/app/config/navidrome-salt.key";
           HOMEPAGE_FILE_ADGUARD_USERNAME = "/app/config/adguard-username.key";
           HOMEPAGE_FILE_ADGUARD_PASSWORD = "/app/config/adguard-password.key";
+          HOMEPAGE_FILE_QBITTORRENT_USERNAME = "/app/config/qbittorrent-username.key";
+          HOMEPAGE_FILE_QBITTORRENT_PASSWORD = "/app/config/qbittorrent-password.key";
         };
         # environmentFiles = [
         #   config.age.secrets.paperless.path
