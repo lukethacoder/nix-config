@@ -56,6 +56,9 @@ in
 
     templates = {
       "domainName".content = ''${config.sops.placeholder.domain_name}'';
+      "traefik-env".content = ''
+        DUCKDNS_TOKEN=${config.sops.placeholder."duckdns/token"}
+      '';
       "immich-env".content = ''
         DB_USERNAME=${config.sops.placeholder."immich/postgres_username"}
         DB_PASSWORD=${config.sops.placeholder."immich/postgres_password"}

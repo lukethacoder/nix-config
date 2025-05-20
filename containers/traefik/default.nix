@@ -23,7 +23,7 @@ in
           "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
           "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=duckdns"
           "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=8.8.8.8:53"
-          # "--certificatesresolvers.letsencrypt.acme.email=${builtins.readFile config.sops.secrets.email_address.path}"
+          "--certificatesresolvers.letsencrypt.acme.email=dev@lukesecomb.digital"
           # HTTP
           "--entrypoints.web.address=:80"
           "--entrypoints.web.http.redirections.entrypoint.to=websecure"
@@ -52,9 +52,9 @@ in
           "443:443"
           "80:80"
         ];
-        environment = {
-          DUCKDNS_TOKEN = config.sops.secrets."duckdns/token".path;
-        };
+        environmentFiles = [
+          config.sops.templates."traefik-env".path
+        ];
         volumes = [
           "/var/run/podman/podman.sock:/var/run/docker.sock:ro"
           "${vars.serviceConfigRoot}/traefik/acme.json:/acme.json"
