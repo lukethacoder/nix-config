@@ -17,7 +17,7 @@ in
   virtualisation.oci-containers = {
     containers = {
       qbittorrent = {
-        image = "linuxserver/qbittorrent:latest";
+        image = "linuxserver/qbittorrent:5.1.0";
         autoStart = true;
         dependsOn = [
           "gluetun"
@@ -43,8 +43,8 @@ in
         ];
         environment = {
           TZ = vars.timeZone;
-          PUID = "994";
-          GUID = "993";
+          PUID = "1000";
+          GUID = "100";
           WEBUI_PORT = "8112";
           TORRENTING_PORT = "6881";
         };
@@ -81,13 +81,6 @@ in
           TZ = vars.timeZone;
           VPN_TYPE = "wireguard";
           VPN_SERVICE_PROVIDER = "custom";
-          # I know, we shouldn't be using readFile here, but gluetun doesn't like parsing the paths
-          # WIREGUARD_ENDPOINT_IP = config.sops.secrets."wireguard/endpoint_ip".path;
-          # WIREGUARD_ENDPOINT_PORT = config.sops.secrets."wireguard/endpoint_port".path;
-          # WIREGUARD_PUBLIC_KEY = config.sops.secrets."wireguard/public_key".path;
-          # WIREGUARD_PRIVATE_KEY = config.sops.secrets."wireguard/private_key".path;
-          # WIREGUARD_ADDRESSES = builtins.readFile config.sops.secrets."wireguard/addresses".path;
-          # WIREGUARD_ADDRESSES = "10.13.91.97/24";
         };
       };
     };
