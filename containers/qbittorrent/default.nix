@@ -14,6 +14,17 @@ in
 {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
+  users = {
+    groups.qbittorrent = {
+      gid = 1100;
+    };
+    users.qbittorrent = {
+      uid = 1100;
+      isSystemUser = true;
+      group = "qbittorrent";
+    };
+  };
+
   virtualisation.oci-containers = {
     containers = {
       qbittorrent = {
@@ -43,8 +54,8 @@ in
         ];
         environment = {
           TZ = vars.timeZone;
-          PUID = "1000";
-          GUID = "100";
+          PUID = builtins.toString config.users.users.qbittorrent.uid;
+          GUID = builtins.toString config.users.groups.qbittorrent.gid;
           WEBUI_PORT = "8112";
           TORRENTING_PORT = "6881";
         };
@@ -90,10 +101,16 @@ in
     let
       user = config.users.users.luke.name;
       group = config.users.users.luke.group;
+      userSystem = config.users.users.qbittorrent.name;
+      groupSystem = config.users.users.qbittorrent.group;
     in
       ''
         chown -R ${user}:${group} ${vars.serviceConfigRoot}/qbittorrent
         chown -R ${user}:${group} ${vars.serviceConfigRoot}/Downloads
         chown -R ${user}:${group} ${vars.serviceConfigRoot}/Downloads.tmp
+
+        chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/qbittorrent
+        chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/Downloads
+        chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/Downloads.tmp
       '';
 }
