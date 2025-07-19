@@ -30,8 +30,7 @@ in
 
   users.users.luke.extraGroups = [ delugeGroup ];
 
-  systemd.tmpfiles.rules = map (x: "d ${x} 0775 ${delugeUser} ${delugeGroup} - -") directories;
-
+  systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
   # Copy local deluge.conf to act as the core.conf for the container
   # home.file = {
@@ -155,11 +154,20 @@ in
       # Ensure directories exist and have correct ownership
       ${builtins.concatStringsSep "\n" (map (dir: ''
         mkdir -p "${dir}"
-        chown -R ${delugeUser}:${delugeGroup} "${dir}"
+        chown -R ${config.users.users.luke.name}:${config.users.users.luke.group} "${dir}"
         chmod -R 775 "${dir}"
       '') directories)}
     '';
   };
+
+  system.activationScripts.fix-deluge-permissions = ''
+    # Ensure directories exist and have correct ownership
+    ${builtins.concatStringsSep "\n" (map (dir: ''
+      mkdir -p "${dir}"
+      chown -R ${config.users.users.luke.name}:${config.users.users.luke.group} "${dir}"
+      chmod -R 775 "${dir}"
+    '') directories)}
+  '';
 
   # system.activationScripts.fix-deluge-permissions = 
   #   let
