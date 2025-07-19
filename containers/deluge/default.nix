@@ -1,11 +1,5 @@
 { config, vars, ... }:
 let
-
-  delugeUser = "deluge";
-  delugeGroup = "deluge";
-  delugeUserUID = "404";
-  delugeGroupGID = "405";
-
   directories = [
     "${vars.serviceConfigRoot}/deluge/config"
     "${vars.serviceConfigRoot}/gluetun"
@@ -19,17 +13,6 @@ let
   ];
 in
 {
-  users.users.${delugeUser} = {
-    uid = builtins.fromJSON delugeUserUID;
-    group = delugeGroup;
-    isSystemUser = true;
-  };
-  users.groups.${delugeGroup} = {
-    gid = builtins.fromJSON delugeGroupGID;
-  };
-
-  users.users.luke.extraGroups = [ delugeGroup ];
-
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
   # Copy local deluge.conf to act as the core.conf for the container
@@ -50,14 +33,14 @@ in
       Type = "oneshot";
       # Allow the service to be restarted without error
       RemainAfterExit = true;
-      User = delugeUser;
-      Group = delugeGroup;
+      User = "share";
+      Group = "share";
     };
     script = ''
       mkdir -p ${vars.serviceConfigRoot}/deluge/config
       if cp ${builtins.path { path = ./deluge.conf; }} ${vars.serviceConfigRoot}/deluge/config/deluge.conf; then
         echo "Config file copied successfully."
-        chown ${delugeUser}:${delugeGroup} ${vars.serviceConfigRoot}/deluge/config/deluge.conf
+        chown share:share ${vars.serviceConfigRoot}/deluge/config/deluge.conf
         chown 644 ${vars.serviceConfigRoot}/deluge/config/deluge.conf
       else
         echo "Error copying deluge config file."
@@ -94,8 +77,8 @@ in
         ];
         environment = {
           TZ = vars.timeZone;
-          PUID = delugeUserUID;
-          GUID = delugeGroupGID;
+          PUID = "994";
+          GUID = "993";
           DELUGE_LOGLEVEL = "info";
         };
       };
@@ -135,54 +118,4 @@ in
       };
     };
   };
-
-  systemd.services.fix-deluge-permissions = {
-    description = "Fix deluge directory permissions";
-    after = [ "local-fs.target" ];
-    before = [
-      "podman-deluge.service"
-      "podman-gluetun.service"
-    ];
-    wantedBy = [
-      "multi-user.target"
-    ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      # Ensure directories exist and have correct ownership
-      ${builtins.concatStringsSep "\n" (map (dir: ''
-        mkdir -p "${dir}"
-        chown -R ${config.users.users.luke.name}:${config.users.users.luke.group} "${dir}"
-        chmod -R 775 "${dir}"
-      '') directories)}
-    '';
-  };
-
-  system.activationScripts.fix-deluge-permissions = ''
-    # Ensure directories exist and have correct ownership
-    ${builtins.concatStringsSep "\n" (map (dir: ''
-      mkdir -p "${dir}"
-      chown -R ${config.users.users.luke.name}:${config.users.users.luke.group} "${dir}"
-      chmod -R 775 "${dir}"
-    '') directories)}
-  '';
-
-  # system.activationScripts.fix-deluge-permissions = 
-  #   let
-  #     user = config.users.users.luke.name;
-  #     group = config.users.users.luke.group;
-  #     # userSystem = config.users.users.deluge.name;
-  #     # groupSystem = config.users.users.deluge.group;
-  #   in
-  #     ''
-  #       chown -R ${user}:${group} ${vars.serviceConfigRoot}/deluge/config
-  #       chown -R ${user}:${group} ${vars.mainArray}/Media/Downloads
-  #       chown -R ${user}:${group} ${vars.serviceConfigRoot}/Downloads.tmp
-  #     '';
-      # chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/deluge/config
-      # chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/Downloads
-      # chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/Downloads.tmp
-
 }
