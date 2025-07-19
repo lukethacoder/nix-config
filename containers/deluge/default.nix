@@ -1,5 +1,11 @@
 { config, vars, ... }:
 let
+
+  delugeUser = "deluge";
+  delugeGroup = "deluge";
+  delugeUserUID = "404";
+  delugeGroupGID = "405";
+
   directories = [
     "${vars.serviceConfigRoot}/deluge/config"
     "${vars.serviceConfigRoot}/gluetun"
@@ -7,12 +13,25 @@ let
     # "${vars.serviceConfigRoot}/radarr"
     # "${vars.serviceConfigRoot}/prowlarr"
     # "${vars.serviceConfigRoot}/recyclarr"
+    "${vars.mainArray}/Media/Downloads"
     "${vars.serviceConfigRoot}/Downloads.tmp"
     "${vars.serviceConfigRoot}/Downloads"
   ];
 in
 {
-  systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
+  users.users.${delugeUser} = {
+    uid = builtins.fromJSON delugeUserUID;
+    group = delugeGroup;
+    isSystemUser = true;
+  };
+  users.groups.${delugeGroup} = {
+    gid = builtins.fromJSON delugeGroupGID;
+  };
+
+  users.users.luke.extraGroups = [ delugeGroup ];
+
+  systemd.tmpfiles.rules = map (x: "d ${x} 0775 ${delugeUser} ${delugeGroup} - -") directories;
+
 
   # Copy local deluge.conf to act as the core.conf for the container
   # home.file = {
@@ -22,22 +41,25 @@ in
   systemd.services.deluge-copy-config = {
     description = "Copy deluge.conf before container is started";
     before = [
-      "docker.service"
-      "podman.service"
+      "podman-deluge.service"
+      "podman-gluetun.service"
     ];
     wantedBy = [
-      "docker.service"
-      "podman.service"
+      "podman-deluge.service"
     ];
     serviceConfig = {
       Type = "oneshot";
       # Allow the service to be restarted without error
       RemainAfterExit = true;
+      User = delugeUser;
+      Group = delugeGroup;
     };
     script = ''
-      mkdir -p ${vars.serviceConfigRoot}/deluge/
-      if cp ${builtins.path { path = ./deluge.conf; }} ${vars.serviceConfigRoot}/deluge/deluge.conf; then
+      mkdir -p ${vars.serviceConfigRoot}/deluge/config
+      if cp ${builtins.path { path = ./deluge.conf; }} ${vars.serviceConfigRoot}/deluge/config/deluge.conf; then
         echo "Config file copied successfully."
+        chown ${delugeUser}:${delugeGroup} ${vars.serviceConfigRoot}/deluge/config/deluge.conf
+        chown 644 ${vars.serviceConfigRoot}/deluge/config/deluge.conf
       else
         echo "Error copying deluge config file."
         exit 1
@@ -48,7 +70,7 @@ in
   virtualisation.oci-containers = {
     containers = {
       deluge = {
-        image = "linuxserver/deluge:latest";
+        image = "linuxserver/deluge:2.2.0";
         autoStart = true;
         dependsOn = [
           "gluetun"
@@ -66,15 +88,15 @@ in
           "-l=homepage.widget.url=http://gluetun:8112"
         ];
         volumes = [
-          "${vars.serviceConfigRoot}/Downloads:/data/completed"
+          "${vars.mainArray}/Media/Downloads:/data/completed"
           "${vars.serviceConfigRoot}/Downloads.tmp:/data/incomplete"
           "${vars.serviceConfigRoot}/deluge/config:/config"
           "${vars.serviceConfigRoot}/deluge/config/deluge.conf:/config/core.conf"
         ];
         environment = {
           TZ = vars.timeZone;
-          PUID = "994";
-          GUID = "993";
+          PUID = delugeUserUID;
+          GUID = delugeGroupGID;
           DELUGE_LOGLEVEL = "info";
         };
       };
@@ -110,26 +132,49 @@ in
           TZ = vars.timeZone;
           VPN_TYPE = "wireguard";
           VPN_SERVICE_PROVIDER = "custom";
-          # I know, we shouldn't be using readFile here, but gluetun doesn't like parsing the paths
-          # WIREGUARD_ENDPOINT_IP = config.sops.secrets."wireguard/endpoint_ip".path;
-          # WIREGUARD_ENDPOINT_PORT = config.sops.secrets."wireguard/endpoint_port".path;
-          # WIREGUARD_PUBLIC_KEY = config.sops.secrets."wireguard/public_key".path;
-          # WIREGUARD_PRIVATE_KEY = config.sops.secrets."wireguard/private_key".path;
-          # WIREGUARD_ADDRESSES = builtins.readFile config.sops.secrets."wireguard/addresses".path;
-          # WIREGUARD_ADDRESSES = "10.13.91.97/24";
         };
       };
     };
   };
 
-  system.activationScripts.giveUserAccessToDelugeDir = 
-    let
-      user = config.users.users.luke.name;
-      group = config.users.users.luke.group;
-    in
-      ''
-        chown -R ${user}:${group} ${vars.serviceConfigRoot}/deluge/config
-        chown -R ${user}:${group} ${vars.serviceConfigRoot}/Downloads
-        chown -R ${user}:${group} ${vars.serviceConfigRoot}/Downloads.tmp
-      '';
+  systemd.services.fix-deluge-permissions = {
+    description = "Fix deluge directory permissions";
+    after = [ "local-fs.target" ];
+    before = [
+      "podman-deluge.service"
+      "podman-gluetun.service"
+    ];
+    wantedBy = [
+      "multi-user.target"
+    ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      # Ensure directories exist and have correct ownership
+      ${builtins.concatStringsSep "\n" (map (dir: ''
+        mkdir -p "${dir}"
+        chown -R ${delugeUser}:${delugeGroup} "${dir}"
+        chmod -R 775 "${dir}"
+      '') directories)}
+    '';
+  };
+
+  # system.activationScripts.fix-deluge-permissions = 
+  #   let
+  #     user = config.users.users.luke.name;
+  #     group = config.users.users.luke.group;
+  #     # userSystem = config.users.users.deluge.name;
+  #     # groupSystem = config.users.users.deluge.group;
+  #   in
+  #     ''
+  #       chown -R ${user}:${group} ${vars.serviceConfigRoot}/deluge/config
+  #       chown -R ${user}:${group} ${vars.mainArray}/Media/Downloads
+  #       chown -R ${user}:${group} ${vars.serviceConfigRoot}/Downloads.tmp
+  #     '';
+      # chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/deluge/config
+      # chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/Downloads
+      # chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/Downloads.tmp
+
 }

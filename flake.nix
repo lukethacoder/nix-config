@@ -89,8 +89,8 @@
             # Services and applications
             ./containers/homepage
             ./containers/traefik
-            # ./containers/deluge
-            ./containers/qbittorrent
+            ./containers/deluge
+            # ./containers/qbittorrent
             # ./containers/grafana
             ./containers/jellyfin
             ./containers/navidrome
