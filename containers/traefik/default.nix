@@ -17,6 +17,7 @@ in
         autoStart = true;
         cmd = [
           "--api.insecure=true"
+          "--api.debug=true"
           "--providers.docker=true"
           "--providers.docker.exposedbydefault=false"
           "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"

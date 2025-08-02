@@ -4,5 +4,5 @@
   mainArray = "/mnt/user";
   fastArraySync = "/persist/user/sync/";
   serviceConfigRoot = "/persist/opt/services";
-  domainName = "lukethacoder.duckdns.org";
+  domainName = "nah.bz";
 }

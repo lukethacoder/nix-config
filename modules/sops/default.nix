@@ -33,6 +33,7 @@ in
       "tailscale/otp" = {};
       # "tailscale/host_domain" = {};
       "duckdns/token" = {};
+      "cloudflare/dns_api_key" = {};
       "wireguard/endpoint_ip" = {};
       "wireguard/endpoint_port" = {};
       "wireguard/public_key" = {};
