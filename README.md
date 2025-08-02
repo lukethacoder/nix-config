@@ -10,7 +10,7 @@
 - Navidrome
 - Jellyfin
 - Immich
-- DuckDNS
+- ~DuckDNS~ Cloudflare DNS
 - Deluge/Gluetun
 
 ## Machines

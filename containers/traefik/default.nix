@@ -21,7 +21,7 @@ in
           "--providers.docker.exposedbydefault=false"
           "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
           "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
-          "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=duckdns"
+          "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
           "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=8.8.8.8:53"
           "--certificatesresolvers.letsencrypt.acme.email=dev@lukesecomb.digital"
           # HTTP

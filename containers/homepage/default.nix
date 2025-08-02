@@ -51,7 +51,7 @@ in {
         extraOptions = [
           "--pull=newer"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.homepage.rule=Host(`home.lukethacoder.duckdns.org`)"
+          "-l=traefik.http.routers.homepage.rule=Host(`home.${vars.domainName}`)"
           "-l=traefik.http.services.homepage.loadbalancer.server.port=3000"
 
           # Extra Services
