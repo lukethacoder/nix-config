@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOs/nixpkgs/release-24.11";
-    
+
     # disko.url = "github:nix-community/disko";
     # disko.inputs.nixpkgs.follows = "nixpkgs";
 
@@ -72,7 +72,8 @@
             # Base configuration and modules
             ./modules/system
             ./modules/sops
-            ./modules/tailscale
+            # no longer used
+            # ./modules/tailscale
             ./modules/fonts
             ./modules/gnome
             ./modules/podman
@@ -94,11 +95,10 @@
             # ./containers/grafana
             ./containers/jellyfin
             ./containers/navidrome
-            ./containers/immich
+            ./containers/copyparty
+            # TODO: fix immich config
+            # ./containers/immich
             # ./containers/homeassistant
-
-            # ./containers/adguard
-            # ./containers/syncthing
 
             # Users
             ./users/luke
