@@ -25,7 +25,8 @@
     };
     extensions = [
       "nix"
-      "wakatime"
+      # wakatime doesn't currently work here properly
+      # "wakatime"
       "material-icon-theme"
       "one-dark-pro"
       "html"
