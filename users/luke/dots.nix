@@ -6,6 +6,7 @@
   imports = [
     ./gitconfig.nix
     ./vscode.nix
+    ./zed.nix
   ];
 
   home = {
