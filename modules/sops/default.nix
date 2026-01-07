@@ -82,7 +82,7 @@ in
     };
   };
 
-  system.activationScripts.sopsSetAgeKeyOwnership = 
+  system.activationScripts.sopsSetAgeKeyOwnership =
     let
       ageFolder = "${homeDirectory}/.config/sops/age";
       user = config.users.users.luke.name;
