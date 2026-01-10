@@ -15,7 +15,7 @@ in
         extraOptions = [
           "--pull=newer"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.grafana.rule=Host(`grafana.${builtins.readFile config.sops.secrets.domain_name.path}`)"
+          "-l=traefik.http.routers.grafana.rule=Host(`grafana.${vars.domainName}`)"
         ];
         volumes = [
           "${vars.serviceConfigRoot}/grafana:/var/lib/grafana"

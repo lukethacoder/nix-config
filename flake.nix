@@ -92,7 +92,8 @@
             ./containers/traefik
             ./containers/deluge
             # ./containers/qbittorrent
-            # ./containers/grafana
+            ./containers/promethous
+            ./containers/grafana
             ./containers/jellyfin
             ./containers/navidrome
             ./containers/copyparty
