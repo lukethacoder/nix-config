@@ -21,8 +21,8 @@ in
 {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 472 0 - -") directories;
 
-  # Create a prometheous.yml file
-  systemd.services."podman-prometheous" = {
+  # Create a prometheus.yml file
+  systemd.services."podman-prometheus" = {
     preStart = ''
       mkdir -p ${configPath}
       cp ${prometheusYml} ${configFilePath}
@@ -33,17 +33,17 @@ in
 
   virtualisation.oci-containers = {
     containers = {
-      prometheous = {
-        image = "prom/prometheous";
+      prometheus = {
+        image = "prom/prometheus";
         autoStart = true;
         extraOptions = [
           "--pull=newer"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.prometheous.rule=Host(`prometheous.${vars.domainName}`)"
+          "-l=traefik.http.routers.prometheus.rule=Host(`prometheus.${vars.domainName}`)"
         ];
         volumes = [
-          "${etcPath}:/etc/prometheous"
-          "${configPath}:/prometheous"
+          "${etcPath}:/etc/prometheus"
+          "${configPath}:/prometheus"
         ];
         ports = [ "9090:9090" ];
       };
