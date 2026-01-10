@@ -16,6 +16,11 @@ in
           "--pull=newer"
           "-l=traefik.enable=true"
           "-l=traefik.http.routers.grafana.rule=Host(`grafana.${vars.domainName}`)"
+          "-l=homepage.group=Services"
+          "-l=homepage.name=Grafana"
+          "-l=homepage.icon=grafana"
+          "-l=homepage.href=https://grafana.${vars.domainName}"
+          "-l=homepage.description=Dashboards"
         ];
         volumes = [
           "${vars.serviceConfigRoot}/grafana:/var/lib/grafana"
