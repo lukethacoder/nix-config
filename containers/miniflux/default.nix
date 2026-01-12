@@ -15,31 +15,30 @@ in
         dependsOn = [
           "miniflux-db"
         ];
-        ports = [ "6237:6237" ];
         extraOptions = [
           "--pull=newer"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.rss.rule=Host(`rss.${vars.domainName}`)"
-          "-l=traefik.http.services.rss.loadbalancer.server.port=6237"
+          "-l=traefik.http.routers.miniflux.rule=Host(`miniflux.${vars.domainName}`)"
+          "-l=traefik.http.services.miniflux.loadbalancer.server.port=8080"
+
           "-l=homepage.group=Services"
           "-l=homepage.name=miniflux"
           "-l=homepage.icon=miniflux"
-          "-l=homepage.href=https://rss.${vars.domainName}"
+          "-l=homepage.href=https://miniflux.${vars.domainName}"
           "-l=homepage.description=RSS"
           "-l=homepage.widget.type=miniflux"
           "-l=homepage.widget.password=test"
-          "-l=homepage.widget.url=http://miniflux:6237"
+          "-l=homepage.widget.url=https://miniflux.${vars.domainName}"
         ];
         environment = {
           TZ = vars.timeZone;
-          PUID = "994";
-          GUID = "993";
-
+          BASE_URL = "https://miniflux.${vars.domainName}";
           DATABASE_URL = "postgres://miniflux:test@miniflux-db/miniflux?sslmode=disable";
           RUN_MIGRATIONS = "1";
           CREATE_ADMIN = "1";
           ADMIN_USERNAME = "admin";
           ADMIN_PASSWORD = "test123";
+          FETCH_YOUTUBE_WATCH_TIME = "1";
           METRICS_COLLECTOR = "1";
           METRICS_ALLOWED_NETWORKS = "0.0.0.0/0";
         };
@@ -56,7 +55,7 @@ in
           POSTGRES_PASSWORD = "test";
           POSTGRES_DB = "miniflux";
         };
-      }
+      };
     };
   };
 }
