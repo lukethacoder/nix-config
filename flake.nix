@@ -91,6 +91,7 @@
             ./containers/homepage
             ./containers/traefik
             ./containers/deluge
+            ./containers/miniflux
             # ./containers/qbittorrent
             ./containers/prometheus
             ./containers/grafana
