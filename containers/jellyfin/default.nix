@@ -6,7 +6,7 @@ let
     "${vars.mainArray}/Media/Movies"
   ];
   # adjust to bump the version when required
-  jellyfinVersion = "10.10.6";
+  jellyfinVersion = "10.11.5";
 in {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
