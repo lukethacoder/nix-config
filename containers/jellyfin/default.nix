@@ -27,6 +27,8 @@ in {
     ];
   };
 
+  # TODO: post-intall, set the `EnableMetrics` flag to `true` in the `/jellyfin/system.xml` file
+
   virtualisation.oci-containers = {
     containers = {
       jellyfin = {
