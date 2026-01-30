@@ -33,8 +33,7 @@ in {
           ND_SESSIONTIMEOUT = "24h";
           ND_BASEURL = "http://navidrome.${vars.domainName}";
           ND_LASTFM_ENABLED = "true";
-          # ND_LASTFM_APIKEY = config.sops.secrets."lastfm/api_key".path;
-          # ND_LASTFM_SECRET = config.sops.secrets."lastfm/api_secret".path;
+          ND_PROMETHEUS_ENABLED = "true";
         };
         environmentFiles = [
           config.sops.templates."navidrome-env".path
