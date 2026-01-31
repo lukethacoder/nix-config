@@ -91,15 +91,14 @@
             ./containers/homepage
             ./containers/traefik
             ./containers/deluge
-            ./containers/miniflux
             # ./containers/qbittorrent
+            ./containers/miniflux
             ./containers/prometheus
             ./containers/grafana
             ./containers/jellyfin
             ./containers/navidrome
             ./containers/copyparty
-            # TODO: fix immich config
-            # ./containers/immich
+            ./containers/immich
             # ./containers/homeassistant
 
             # Users
