@@ -17,7 +17,7 @@ in {
   virtualisation.oci-containers = {
     containers = {
       navidrome = {
-        image = "deluan/navidrome:0.58.0";
+        image = "deluan/navidrome:0.60.0";
         autoStart = true;
         ports = [ "4533:4533" ];
         volumes = [
