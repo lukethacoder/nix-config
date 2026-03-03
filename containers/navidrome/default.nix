@@ -1,9 +1,11 @@
 { config, vars, pkgs, ... }:
-let directories = [
-  "${vars.serviceConfigRoot}/navidrome"
-  "${vars.serviceConfigRoot}/navidrome-mixes"
-  "${vars.mainArray}/Media/Music"
-];
+let 
+  directories = [
+    "${vars.serviceConfigRoot}/navidrome"
+    "${vars.serviceConfigRoot}/navidrome-mixes"
+    "${vars.mainArray}/Media/Music"
+  ];
+  VERSION = "0.60.3";
 in {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
@@ -17,7 +19,7 @@ in {
   virtualisation.oci-containers = {
     containers = {
       navidrome = {
-        image = "deluan/navidrome:0.60.0";
+        image = "deluan/navidrome:${VERSION}";
         autoStart = true;
         ports = [ "4533:4533" ];
         volumes = [
@@ -56,8 +58,9 @@ in {
         ];
       };
       # Separate instance purely for DJ Mixes
+      # TODO: multi libraries are now supported - migrate when possible
       navidrome_mixes = {
-        image = "deluan/navidrome:0.55.0";
+        image = "deluan/navidrome:${VERSION}";
         autoStart = true;
         ports = [ "4534:4533" ];
         volumes = [
