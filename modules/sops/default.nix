@@ -52,6 +52,7 @@ in
       "immich/postgres_username" = {};
       "immich/postgres_password" = {};
       "immich/api_key" = {};
+      "mealie/token" = {};
       samba_password = {};
     };
 
