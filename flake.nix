@@ -98,6 +98,7 @@
             ./containers/jellyfin
             ./containers/navidrome
             ./containers/copyparty
+            ./containers/mealie
             ./containers/immich
             # ./containers/homeassistant
 
