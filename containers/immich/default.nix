@@ -1,8 +1,14 @@
 { config, vars, pkgs, ... }:
-let 
+let
   # adjust to bump the version when required
-  immichVersion = "v2.1.0";
-  immichPhotosDir = "${vars.mainArray}/Photos/immich";
+  immichVersion = "v2.6.1";
+  # bulk of the config lives here
+  immichHddDir = "${vars.mainArray}/immich";
+
+  # External Library root path
+  immichExternalDir = "${vars.mainArray}/Photos";
+
+  # Immich config root dir - stores the /db and /model-cache files
   immichRootDir = "${vars.serviceConfigRoot}/immich";
 
   dbName = "immich";
@@ -11,14 +17,20 @@ let
   dbDir = "${immichRootDir}/db";
   modelCacheDir = "${immichRootDir}/model-cache";
 
+  containerUploadDir = "/usr/src/app/upload";
+
+  # TODO:
+  # - clean up /db and /model-cache folders on the HDD
+  # - clean up all but /db and /model-cache folders on the SSD
+
   directories = [
     immichRootDir
-    immichPhotosDir
+    immichHddDir
     "${vars.mainArray}/Photos"
     dbDir
     modelCacheDir
   ];
-in {  
+in {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
   # Keep redis from complaining
@@ -37,11 +49,10 @@ in {
             "2283:2283"
           ];
           volumes = [
-            "${immichPhotosDir}:/data/upload"
-            "${immichRootDir}:/data"
+            "${immichHddDir}:/data"
             "/etc/localtime:/etc/localtime:ro"
-            # External Libraries
-            "${vars.mainArray}/Photos:/Photos"
+            # External Libraries - in the immich GUI, use `/Photos/*` as the folder path
+            "${immichExternalDir}:/Photos"
           ];
           environment = {
             TZ = vars.timeZone;
@@ -50,7 +61,6 @@ in {
             REDIS_HOSTNAME = redisHostName;
             DB_DATABASE_NAME = dbName;
             IMMICH_TELEMETRY_INCLUDE = "all";
-            UPLOAD_LOCATION = "/data/upload";
           };
           environmentFiles = [
             config.sops.templates."immich-env".path
