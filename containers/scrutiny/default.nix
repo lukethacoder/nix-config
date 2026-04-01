@@ -1,42 +1,59 @@
-{ config, pkgs, ... }:
-{
-  virtualisation.oci-containers.containers."scrutiny" = {
-    autoStart = true;
-    image = "ghcr.io/analogj/scrutiny:master-omnibus";
+{ config, vars, pkgs, ... }:
+let
+  directories = [
+    "${vars.serviceConfigRoot}/scrutiny"
+  ];
+in {
+  systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
-    ports = [
-      "8080:8080" # Web UI
-      "8086:8086" # InfluxDB admin
-    ];
+  system.userActivationScripts.scrutiny-data.text = ''
+    mkdir -p ${vars.serviceConfigRoot}/scrutiny/config \
+      ${vars.serviceConfigRoot}/scrutiny/influxdb
+  '';
 
-    volumes = [
-      "/run/udev:/run/udev:ro"
-      "/opt/scrutiny/config:/opt/scrutiny/config"
-      "/opt/scrutiny/influxdb:/opt/scrutiny/influxdb"
-    ];
+  virtualisation.oci-containers = {
+    containers = {
+      scrutiny = {
+        image = "ghcr.io/analogj/scrutiny:master-omnibus";
+        autoStart = true;
+        ports = [
+          "8084:8080" # Web UI
+          "8086:8086" # InfluxDB admin
+        ];
+        volumes = [
+          "/run/udev:/run/udev:ro"
+          "${vars.serviceConfigRoot}/scrutiny/config:/opt/scrutiny/config"
+          "${vars.serviceConfigRoot}/scrutiny/influxdb:/opt/scrutiny/influxdb"
+        ];
+        extraOptions = [
+          # SYS_RAWIO is required for SMART data access
+          "--cap-add=SYS_RAWIO"
+          # SYS_ADMIN is required for NVMe drives
+          "--cap-add=SYS_ADMIN"
 
-    # SYS_RAWIO is required for SMART data access
-    # SYS_ADMIN is required for NVMe drives
-    extraOptions = [
-      "--cap-add=SYS_RAWIO"
-      "--cap-add=SYS_ADMIN"
+          # SSD Boot Drive
+          "--device=/dev/nvme0n1"
 
-      # SSD Boot Drive
-      "--device=/dev/disk/by-uuid/89508460-a7c2-4869-9bf9-1cdbd22efe51"
+          # HDDs
+          "--device=/dev/disk/by-id/ata-ST16000NM001G-2KK103_ZL20PRJR"
+          "--device=/dev/disk/by-id/ata-ST16000NM001G-2KK103_ZL2A58E2"
+          "--device=/dev/disk/by-id/ata-ST16000NM001G-2KK103_ZL2F9ZEP"
+          "--device=/dev/disk/by-id/ata-ST16000NM001G-2KK103_ZL2GVRCT"
 
-      # HDDs
-      "--device=/dev/disk/by-partlabel/disk-data1-data"
-      "--device=/dev/disk/by-partlabel/disk-data2-data"
-      "--device=/dev/disk/by-partlabel/disk-data3-data"
-      "--device=/dev/disk/by-partlabel/disk-parity1-parity"
+          "-l=traefik.enable=true"
+          "-l=traefik.http.routers.scrutiny.rule=Host(`scrutiny.${vars.domainName}`)"
+          "-l=traefik.http.routers.scrutiny.service=scrutiny"
+          "-l=traefik.http.services.scrutiny.loadbalancer.server.port=8080"
 
-      "-l=homepage.group=Services"
-      "-l=homepage.name=Scrutiny"
-      "-l=homepage.icon=scrutiny.svg"
-      "-l=homepage.href=https://scrutiny.${vars.domainName}"
-      "-l=homepage.description=S.M.A.R.T. Monitoring"
-      "-l=homepage.widget.type=scrutiny"
-      "-l=homepage.widget.url=https://scrutiny.${vars.domainName}"
-    ];
+          "-l=homepage.group=Services"
+          "-l=homepage.name=Scrutiny"
+          "-l=homepage.icon=scrutiny.svg"
+          "-l=homepage.href=https://scrutiny.${vars.domainName}"
+          "-l=homepage.description=S.M.A.R.T. Monitoring"
+          "-l=homepage.widget.type=scrutiny"
+          "-l=homepage.widget.url=https://scrutiny.${vars.domainName}"
+        ];
+      };
+    };
   };
 }
