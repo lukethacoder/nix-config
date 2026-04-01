@@ -100,6 +100,7 @@
             ./containers/copyparty
             ./containers/mealie
             ./containers/immich
+            ./containers/scrutiny
             # ./containers/homeassistant
 
             # Users
