@@ -4,7 +4,7 @@ let
   configFilePath = "${configPath}/prometheus.yml";
   directories = [ configPath ];
 
-  # Copyparty Configuration
+  # Prometheus Configuration
   prometheusYml = pkgs.writeText "prometheus.yml" ''
     global:
       scrape_interval: 10s
@@ -15,10 +15,14 @@ let
         scheme: "https"
         static_configs:
           - targets: ["navidrome.${vars.domainName}"]
-      - job_name: "immich"
-        scheme: "https"
+      - job_name: "immich-api"
+        scheme: "http"
         static_configs:
-          - targets: ["immich.${vars.domainName}"]
+          - targets: ["host.containers.internal:8081"]
+      - job_name: "immich-microservices"
+        scheme: "http"
+        static_configs:
+          - targets: ["host.containers.internal:8082"]
       - job_name: "jellyfin"
         scheme: "https"
         static_configs:

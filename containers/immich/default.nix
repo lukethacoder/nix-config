@@ -46,7 +46,9 @@ in {
           autoStart = true;
           image = "ghcr.io/immich-app/immich-server:${immichVersion}";
           ports = [
-            "2283:2283"
+            "2283:2283" # Main Appplication
+            "8081:8081" # API Metrics
+            "8082:8082" # Microservice Metrics
           ];
           volumes = [
             "${immichHddDir}:/data"
