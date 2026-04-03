@@ -61,6 +61,7 @@ in {
             REDIS_HOSTNAME = redisHostName;
             DB_DATABASE_NAME = dbName;
             IMMICH_TELEMETRY_INCLUDE = "all";
+            IMMICH_LOG_FORMAT = "json";
           };
           environmentFiles = [
             config.sops.templates."immich-env".path

@@ -15,6 +15,10 @@ let
         scheme: "https"
         static_configs:
           - targets: ["navidrome.${vars.domainName}"]
+      - job_name: "immich"
+        scheme: "https"
+        static_configs:
+          - targets: ["immich.${vars.domainName}"]
       - job_name: "jellyfin"
         scheme: "https"
         static_configs:
