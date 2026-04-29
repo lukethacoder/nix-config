@@ -101,6 +101,7 @@
             ./containers/mealie
             ./containers/immich
             ./containers/scrutiny
+            ./containers/albumz
             # ./containers/homeassistant
 
             # Users
