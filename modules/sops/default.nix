@@ -81,6 +81,8 @@ in
       "albumz-env".content = ''
         DB_USERNAME=${config.sops.placeholder."albumz/postgres_username"}
         DB_PASSWORD=${config.sops.placeholder."albumz/postgres_password"}
+        POSTGRES_USER=${config.sops.placeholder."albumz/postgres_username"}
+        POSTGRES_PASSWORD=${config.sops.placeholder."albumz/postgres_password"}
         DATABASE_URL=postgresql://${config.sops.placeholder."albumz/postgres_username"}:${config.sops.placeholder."albumz/postgres_password"}@albumz-db:5432/albumz
         JWT_SECRET=${config.sops.placeholder."albumz/jwt_secret"}
         LASTFM_API_KEY=${config.sops.placeholder."lastfm/api_key"}
