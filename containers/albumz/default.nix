@@ -44,11 +44,11 @@ in {
             "-l=homepage.widget.version=2"
           ];
           dependsOn = [
-            "albumz_db"
+            "albumz-db"
           ];
         };
 
-        albumz_db = {
+        albumz-db = {
           autoStart = true;
           image = "postgres:16-alpine";
           ports = [
