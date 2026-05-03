@@ -2,8 +2,8 @@
 {
   fonts = {
     packages = with pkgs; [
-      fira-code-nerdfont
-      (nerdfonts.override { fonts = [ "FiraCode" ]; })
+      nerd-fonts.fira-code
+      # (nerdfonts.override { fonts = [ "FiraCode" ]; })
     ];
 
     fontconfig = {

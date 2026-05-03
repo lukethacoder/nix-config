@@ -1,7 +1,7 @@
 { config, vars, pkgs, ... }:
 let
   # adjust to bump the version when required
-  immichVersion = "v2.6.1";
+  immichVersion = "v2.6.3";
   # bulk of the config lives here
   immichHddDir = "${vars.mainArray}/immich";
 

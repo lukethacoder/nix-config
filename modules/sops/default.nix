@@ -3,7 +3,7 @@ let
   secretsDirectory = builtins.toString inputs.nix-secrets;
   secretsFile = "${secretsDirectory}/secrets.yaml";
   homeDirectory = "/home/luke";
-  secrets = builtins.extraBuiltins.readSops "${inputs.nix-secrets}/secrets.nix.enc";
+  # secrets = builtins.extraBuiltins.readSops "${inputs.nix-secrets}/secrets.nix.enc";
 in
 {
   imports = [ inputs.sops-nix.nixosModules.sops ];

@@ -2,13 +2,13 @@
   description = "noob NixOS Flake Configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOs/nixpkgs/release-24.11";
+    nixpkgs.url = "github:NixOs/nixpkgs/release-25.11";
 
     # disko.url = "github:nix-community/disko";
     # disko.inputs.nixpkgs.follows = "nixpkgs";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.11";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -58,9 +58,9 @@
         # inherit overlays;
       };
     in {
-      nix.extraOptions = ''
-        plugin-files = ${pkgs.nix-plugins}/lib/nix/plugins
-      '';
+      # nix.extraOptions = ''
+      #   plugin-files = ${pkgs.nix-plugins}/lib/nix/plugins
+      # '';
       nixosConfigurations = {
         opslag = nixpkgs.lib.nixosSystem {
           inherit system;
