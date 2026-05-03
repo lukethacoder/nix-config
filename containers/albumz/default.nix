@@ -1,7 +1,7 @@
 { config, vars, pkgs, ... }:
 let
   # adjust to bump the version when required
-  albumzVersion = "v0.1.1";
+  albumzVersion = "0.1.1";
 
   # albumz config root dir
   rootDir = "${vars.serviceConfigRoot}/albumz";
@@ -27,13 +27,13 @@ in {
           autoStart = true;
           image = "ghcr.io/lukethacoder/albumz:${albumzVersion}";
           ports = [
-            "3000:3000"
+            "3434:3000"
           ];
           environment = {
             TZ = vars.timeZone;
             DATABASE_URL = "postgresql://${postgresUser}:${postgresPassword}@${dbHostName}:5432/${dbName}";
             JWT_SECRET = "test123";
-            ORIGIN = "albumz.${vars.domainName}";
+            ORIGIN = "https://albumz.${vars.domainName}";
             # LASTFM_API_KEY
             # SPOTIFY_CLIENT_ID
             # SPOTIFY_CLIENT_SECRET
@@ -61,7 +61,7 @@ in {
           autoStart = true;
           image = "postgres:16-alpine";
           ports = [
-            "5432:5432"
+            "5433:5432"
           ];
           volumes = [
             "${dbDir}:/var/lib/postgresql/data"
