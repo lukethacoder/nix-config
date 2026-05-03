@@ -26,12 +26,12 @@ in {
         albumz = {
           autoStart = true;
           image = "ghcr.io/lukethacoder/albumz:${albumzVersion}";
-          ports = [ 
+          ports = [
             "3000:3000"
           ];
           environment = {
             TZ = vars.timeZone;
-            DATABASE_URL = "postgresql://${postgresUser}:${postgresPassword}@postgres:5432/${dbHostName}";
+            DATABASE_URL = "postgresql://${postgresUser}:${postgresPassword}@${dbHostName}:5432/${dbName}";
             JWT_SECRET = "test123";
             ORIGIN = "albumz.${vars.domainName}";
             # LASTFM_API_KEY
