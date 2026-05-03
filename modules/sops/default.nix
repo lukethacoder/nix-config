@@ -52,6 +52,11 @@ in
       "immich/postgres_username" = {};
       "immich/postgres_password" = {};
       "immich/api_key" = {};
+      "albumz/postgres_username" = {};
+      "albumz/postgres_password" = {};
+      "albumz/jwt_secret" = {};
+      "spotify/client_id" = {};
+      "spotify/client_secret" = {};
       "mealie/token" = {};
       samba_password = {};
     };
@@ -72,6 +77,15 @@ in
       "navidrome-env".content = ''
         ND_LASTFM_APIKEY=${config.sops.placeholder."lastfm/api_key"}
         ND_LASTFM_SECRET=${config.sops.placeholder."lastfm/api_secret"}
+      '';
+      "albumz-env".content = ''
+        DB_USERNAME=${config.sops.placeholder."albumz/postgres_username"}
+        DB_PASSWORD=${config.sops.placeholder."albumz/postgres_password"}
+        DATABASE_URL=postgresql://${config.sops.placeholder."albumz/postgres_username"}:${config.sops.placeholder."albumz/postgres_password"}@albumz_db:5432/albumz
+        JWT_SECRET=${config.sops.placeholder."albumz/jwt_secret"}
+        LASTFM_API_KEY=${config.sops.placeholder."lastfm/api_key"}
+        SPOTIFY_CLIENT_ID=${config.sops.placeholder."spotify/client_id"}
+        SPOTIFY_CLIENT_SECRET=${config.sops.placeholder."spotify/client_secret"}
       '';
       "wireguard-env".content = ''
         WIREGUARD_ENDPOINT_IP=${config.sops.placeholder."wireguard/endpoint_ip"}
