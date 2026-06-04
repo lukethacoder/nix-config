@@ -18,17 +18,17 @@ in
         extraOptions = [
           "--pull=newer"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.miniflux.rule=Host(`miniflux.${vars.domainName}`)"
+          "-l=traefik.http.routers.miniflux.rule=Host(`rss.${vars.domainName}`)"
           "-l=traefik.http.services.miniflux.loadbalancer.server.port=8080"
 
           "-l=homepage.group=Services"
           "-l=homepage.name=miniflux"
           "-l=homepage.icon=miniflux"
-          "-l=homepage.href=https://miniflux.${vars.domainName}"
+          "-l=homepage.href=https://rss.${vars.domainName}"
           "-l=homepage.description=RSS"
           "-l=homepage.widget.type=miniflux"
           "-l=homepage.widget.password=test"
-          "-l=homepage.widget.url=https://miniflux.${vars.domainName}"
+          "-l=homepage.widget.url=https://rss.${vars.domainName}"
         ];
         environment = {
           TZ = vars.timeZone;
