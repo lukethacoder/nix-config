@@ -3,7 +3,7 @@ let
   directories = [
     "${vars.serviceConfigRoot}/mealie"
   ];
-  VERSION = "v3.11.0";
+  VERSION = "v3.19.2";
 in {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
