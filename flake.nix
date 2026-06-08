@@ -102,6 +102,7 @@
             ./containers/immich
             ./containers/scrutiny
             ./containers/albumz
+            ./containers/rsshub
             # ./containers/homeassistant
 
             # Users
