@@ -1,6 +1,6 @@
 { config, vars, pkgs, ... }:
 let
-  rsshubVersion = "latest";
+  rsshubVersion = "0.1.2";
 
   rootDir = "${vars.serviceConfigRoot}/rsshub";
   redisDir = "${rootDir}/redis";
