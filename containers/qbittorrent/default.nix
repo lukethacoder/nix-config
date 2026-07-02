@@ -97,7 +97,7 @@ in
     };
   };
 
-  system.activationScripts.giveUserAccessToQbittorrentDir = 
+  system.activationScripts.giveUserAccessToQbittorrentDir =
     let
       user = config.users.users.luke.name;
       group = config.users.users.luke.group;

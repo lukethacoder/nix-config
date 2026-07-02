@@ -84,6 +84,7 @@ in {
           "${config.sops.secrets."adguard/password".path}:/app/config/adguard-password.key"
           "${config.sops.secrets."immich/api_key".path}:/app/config/immich.key"
           "${config.sops.secrets."jellyfin/api_key".path}:/app/config/jellyfin.key"
+          "${config.sops.secrets."mealie/token".path}:/app/config/mealie-token.key"
           "${config.sops.secrets."navidrome/username".path}:/app/config/navidrome-username.key"
           "${config.sops.secrets."navidrome/token".path}:/app/config/navidrome-token.key"
           "${config.sops.secrets."navidrome/salt".path}:/app/config/navidrome-salt.key"
@@ -95,6 +96,7 @@ in {
           HOMEPAGE_ALLOWED_HOSTS = "home.${vars.domainName}";
           HOMEPAGE_FILE_IMMICH_KEY = "/app/config/immich.key";
           HOMEPAGE_FILE_JELLYFIN_KEY = "/app/config/jellyfin.key";
+          HOMEPAGE_FILE_MEALIE_TOKEN = "/app/config/mealie-token.key";
           HOMEPAGE_FILE_NAVIDROME_USERNAME = "/app/config/navidrome-username.key";
           HOMEPAGE_FILE_NAVIDROME_TOKEN = "/app/config/navidrome-token.key";
           HOMEPAGE_FILE_NAVIDROME_SALT = "/app/config/navidrome-salt.key";

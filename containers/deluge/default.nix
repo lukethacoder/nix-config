@@ -20,34 +20,34 @@ in
   #   "${specialArgs.vars.serviceConfigRoot}/deluge/deluge.conf".source = ./deluge.conf;
   # };
   
-  systemd.services.deluge-copy-config = {
-    description = "Copy deluge.conf before container is started";
-    before = [
-      "podman-deluge.service"
-      "podman-gluetun.service"
-    ];
-    wantedBy = [
-      "podman-deluge.service"
-    ];
-    serviceConfig = {
-      Type = "oneshot";
-      # Allow the service to be restarted without error
-      RemainAfterExit = true;
-      User = "share";
-      Group = "share";
-    };
-    script = ''
-      mkdir -p ${vars.serviceConfigRoot}/deluge/config
-      if cp ${builtins.path { path = ./deluge.conf; }} ${vars.serviceConfigRoot}/deluge/config/deluge.conf; then
-        echo "Config file copied successfully."
-        chown share:share ${vars.serviceConfigRoot}/deluge/config/deluge.conf
-        chown 644 ${vars.serviceConfigRoot}/deluge/config/deluge.conf
-      else
-        echo "Error copying deluge config file."
-        exit 1
-      fi
-    '';
-  };
+  # systemd.services.deluge-copy-config = {
+  #   description = "Copy deluge.conf before container is started";
+  #   before = [
+  #     "podman-deluge.service"
+  #     "podman-gluetun.service"
+  #   ];
+  #   wantedBy = [
+  #     "podman-deluge.service"
+  #   ];
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     # Allow the service to be restarted without error
+  #     RemainAfterExit = true;
+  #     User = "share";
+  #     Group = "share";
+  #   };
+  #   script = ''
+  #     mkdir -p ${vars.serviceConfigRoot}/deluge/config
+  #     if cp ${builtins.path { path = ./deluge.conf; }} ${vars.serviceConfigRoot}/deluge/config/deluge.conf; then
+  #       echo "Config file copied successfully."
+  #       chown share:share ${vars.serviceConfigRoot}/deluge/config/deluge.conf
+  #       chown 644 ${vars.serviceConfigRoot}/deluge/config/deluge.conf
+  #     else
+  #       echo "Error copying deluge config file."
+  #       exit 1
+  #     fi
+  #   '';
+  # };
 
   virtualisation.oci-containers = {
     containers = {

@@ -10,10 +10,13 @@ in {
       homeassistant = {
         image = "homeassistant/home-assistant:stable";
         autoStart = true;
-        ports = [ "8123:8123" ];
+        ports = [
+          "127.0.0.0:8123:8123"
+        ];
         volumes = [
           "${vars.serviceConfigRoot}/homeassistant:/config"
           "/etc/localtime:/localtime:ro"
+          "/run/dbus:/run/dbus:ro"
         ];
         environment = {
           TZ = vars.timeZone;
@@ -22,12 +25,14 @@ in {
         };
         extraOptions = [
           "--pull=newer"
+          "--network=host"
+          "--privileged"
           "-l=traefik.enable=true"
-          "-l=traefik.http.routers.navidrome.rule=Host(`homeassistant.${vars.domainName}`)"
-          "-l=traefik.http.services.navidrome.loadbalancer.server.port=8123"
+          "-l=traefik.http.routers.homeassistant.rule=Host(`homeassistant.${vars.domainName}`)"
+          "-l=traefik.http.services.homeassistant.loadbalancer.server.port=8123"
           "-l=homepage.group=Services"
           "-l=homepage.name=Home Assistant"
-          "-l=homepage.icon=homeassistant.svg"
+          "-l=homepage.icon=home-assistant.svg"
           "-l=homepage.href=https://homeassistant.${vars.domainName}"
           "-l=homepage.description=Home Assistant"
           "-l=homepage.widget.type=homeassistant"
