@@ -4,6 +4,8 @@
   inputs = {
     nixpkgs.url = "github:NixOs/nixpkgs/release-25.11";
 
+    claude-code-nix.url = "github:sadjow/claude-code-nix";
+
     # disko.url = "github:nix-community/disko";
     # disko.inputs.nixpkgs.follows = "nixpkgs";
 

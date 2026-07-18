@@ -97,9 +97,12 @@ in
         WIREGUARD_PRIVATE_KEY=${config.sops.placeholder."wireguard/private_key"}
         WIREGUARD_ADDRESSES=${config.sops.placeholder."wireguard/addresses"}
       '';
-      "claude-code-env".content = ''
-        CLAUDE_CODE_OAUTH_TOKEN=${config.sops.placeholder."claude-code/oauth_token"}
-      '';
+      "claude-code-env" = {
+        owner = "luke";
+        content = ''
+          CLAUDE_CODE_OAUTH_TOKEN=${config.sops.placeholder."claude-code/oauth_token"}
+        '';
+      };
     };
   };
 
