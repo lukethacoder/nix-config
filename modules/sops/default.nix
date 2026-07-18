@@ -58,6 +58,7 @@ in
       "spotify/client_id" = {};
       "spotify/client_secret" = {};
       "mealie/token" = {};
+      "claude-code/oauth_token" = {};
       samba_password = {};
     };
 
@@ -95,6 +96,9 @@ in
         WIREGUARD_PUBLIC_KEY=${config.sops.placeholder."wireguard/public_key"}
         WIREGUARD_PRIVATE_KEY=${config.sops.placeholder."wireguard/private_key"}
         WIREGUARD_ADDRESSES=${config.sops.placeholder."wireguard/addresses"}
+      '';
+      "claude-code-env".content = ''
+        CLAUDE_CODE_OAUTH_TOKEN=${config.sops.placeholder."claude-code/oauth_token"}
       '';
     };
   };
