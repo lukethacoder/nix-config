@@ -23,10 +23,10 @@
 
   programs.ssh = {
     enable = true;
-    extraConfig = ''
-    Host *
-      IdentityFile ~/.ssh/id_ed25519
-    '';
+    enableDefaultConfig = false;
+    matchBlocks."*" = {
+      identityFile = "~/.ssh/id_ed25519";
+    };
   };
 
   dconf.settings = {

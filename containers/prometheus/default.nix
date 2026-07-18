@@ -1,8 +1,7 @@
-{ config, vars, pkgs, ... }:
+{ vars, pkgs, ... }:
 let
   configPath = "${vars.serviceConfigRoot}/prometheus";
   configFilePath = "${configPath}/prometheus.yml";
-  directories = [ configPath ];
 
   # Prometheus Configuration
   prometheusYml = pkgs.writeText "prometheus.yml" ''
@@ -30,7 +29,10 @@ let
   '';
 in
 {
-  systemd.tmpfiles.rules = map (x: "d ${x} 0777 472 0 - -") directories;
+  # prometheus runs as its own uid, not the share identity
+  systemd.tmpfiles.rules = [
+    "d ${configPath} 0777 472 0 - -"
+  ];
 
   # Create a prometheus.yml file
   systemd.services."podman-prometheus" = {
@@ -42,30 +44,29 @@ in
     '';
   };
 
-  virtualisation.oci-containers = {
-    containers = {
-      prometheus = {
-        image = "prom/prometheus";
-        autoStart = true;
-        extraOptions = [
-          "--pull=newer"
-          "-l=traefik.enable=true"
-          "-l=traefik.http.routers.prometheus.rule=Host(`prometheus.${vars.domainName}`)"
-          "-l=homepage.group=Services"
-          "-l=homepage.name=Prometheus"
-          "-l=homepage.icon=prometheus"
-          "-l=homepage.href=https://prometheus.${vars.domainName}"
-          "-l=homepage.description=Monitoring and Alerts"
-          "-l=homepage.widget.type=prometheus"
-          "-l=homepage.widget.url=https://prometheus.${vars.domainName}"
-        ];
-        cmd = [
-          "--config.file=/prometheus/prometheus.yml"
-        ];
-        volumes = [
-          "${configPath}:/prometheus"
-        ];
-        ports = [ "9090:9090" ];
+  homelab.services.prometheus = {
+    image = "prom/prometheus";
+    subdomain = "prometheus";
+    # port omitted: traefik auto-detects the exposed port
+    publishPorts = [ "9090:9090" ];
+    volumes = [
+      "${configPath}:/prometheus"
+    ];
+    # image doesn't consume PUID/PGID
+    user = null;
+    extraContainerConfig = {
+      cmd = [
+        "--config.file=/prometheus/prometheus.yml"
+      ];
+    };
+    homepage = {
+      group = "Services";
+      name = "Prometheus";
+      icon = "prometheus";
+      description = "Monitoring and Alerts";
+      widget = {
+        type = "prometheus";
+        url = "https://prometheus.${vars.domainName}";
       };
     };
   };

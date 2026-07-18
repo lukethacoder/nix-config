@@ -1,15 +1,8 @@
-{ config, vars, pkgs, ... }:
-let 
-  directories = [
-    "${vars.serviceConfigRoot}/jellyfin"
-    "${vars.mainArray}/Media/TV"
-    "${vars.mainArray}/Media/Movies"
-  ];
+{ vars, pkgs, ... }:
+let
   # adjust to bump the version when required
   jellyfinVersion = "10.11.5";
 in {
-  systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
-
   nixpkgs.config.packageOverrides = pkgs: {
     vaapiIntel = pkgs.vaapiIntel.override {
       enableHybridCodec = true;
@@ -28,38 +21,37 @@ in {
 
   # TODO: post-intall, set the `EnableMetrics` flag to `true` in the `/jellyfin/system.xml` file
 
-  virtualisation.oci-containers = {
-    containers = {
-      jellyfin = {
-        image = "lscr.io/linuxserver/jellyfin:${jellyfinVersion}";
-        autoStart = true;
-        ports = [ "8096:8096" ];
-        extraOptions = [
-          "--device=/dev/dri:/dev/dri"
-          "-l=traefik.enable=true"
-          "-l=traefik.http.routers.jellyfin.rule=Host(`jellyfin.${vars.domainName}`)"
-          "-l=traefik.http.services.jellyfin.loadbalancer.server.port=8096"
-          "-l=homepage.group=Media"
-          "-l=homepage.name=Jellyfin"
-          "-l=homepage.icon=jellyfin.svg"
-          "-l=homepage.href=https://jellyfin.${vars.domainName}"
-          "-l=homepage.description=Media player"
-          "-l=homepage.widget.type=jellyfin"
-          "-l=homepage.widget.key={{HOMEPAGE_FILE_JELLYFIN_KEY}}"
-          "-l=homepage.widget.url=http://jellyfin:8096"
-          "-l=homepage.widget.enableBlocks=true"
-        ];
-        volumes = [
-          "${vars.mainArray}/Media/TV:/data/tvshows"
-          "${vars.mainArray}/Media/Movies:/data/movies"
-          "${vars.serviceConfigRoot}/jellyfin:/config"
-        ];
-        environment = {
-          TZ = config.sops.secrets.time_zone.path;
-          PUID = "994";
-          UMASK = "002";
-          GUID = "993";
-        };
+  homelab.services.jellyfin = {
+    image = "lscr.io/linuxserver/jellyfin:${jellyfinVersion}";
+    subdomain = "jellyfin";
+    port = 8096;
+    publishPorts = [ "8096:8096" ];
+    dirs = [
+      "${vars.serviceConfigRoot}/jellyfin"
+      "${vars.mainArray}/Media/TV"
+      "${vars.mainArray}/Media/Movies"
+    ];
+    volumes = [
+      "${vars.mainArray}/Media/TV:/data/tvshows"
+      "${vars.mainArray}/Media/Movies:/data/movies"
+      "${vars.serviceConfigRoot}/jellyfin:/config"
+    ];
+    env = {
+      UMASK = "002";
+    };
+    extraPodmanArgs = [
+      "--device=/dev/dri:/dev/dri"
+    ];
+    homepage = {
+      group = "Media";
+      name = "Jellyfin";
+      icon = "jellyfin.svg";
+      description = "Media player";
+      widget = {
+        type = "jellyfin";
+        key = "{{HOMEPAGE_FILE_JELLYFIN_KEY}}";
+        url = "http://jellyfin:8096";
+        enableBlocks = "true";
       };
     };
   };

@@ -27,7 +27,6 @@ in
     };
 
     secrets = {
-      time_zone = {};
       domain_name = {};
       email_address = {};
       "tailscale/otp" = {};

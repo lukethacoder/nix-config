@@ -1,32 +1,25 @@
-{ config, vars, ... }:
-let
-  directories = [
-    "${vars.serviceConfigRoot}/grafana"
-  ];
-in
+{ vars, ... }:
 {
-  systemd.tmpfiles.rules = map (x: "d ${x} 0775 472 0 - -") directories;
+  # grafana runs as its own uid, not the share identity
+  systemd.tmpfiles.rules = [
+    "d ${vars.serviceConfigRoot}/grafana 0775 472 0 - -"
+  ];
 
-  virtualisation.oci-containers = {
-    containers = {
-      grafana = {
-        image = "grafana/grafana";
-        autoStart = true;
-        extraOptions = [
-          "--pull=newer"
-          "-l=traefik.enable=true"
-          "-l=traefik.http.routers.grafana.rule=Host(`grafana.${vars.domainName}`)"
-          "-l=homepage.group=Services"
-          "-l=homepage.name=Grafana"
-          "-l=homepage.icon=grafana"
-          "-l=homepage.href=https://grafana.${vars.domainName}"
-          "-l=homepage.description=Dashboards"
-        ];
-        volumes = [
-          "${vars.serviceConfigRoot}/grafana:/var/lib/grafana"
-        ];
-        ports = [ "3232:3000" ];
-      };
+  homelab.services.grafana = {
+    image = "grafana/grafana";
+    subdomain = "grafana";
+    # port omitted: traefik auto-detects the exposed port
+    publishPorts = [ "3232:3000" ];
+    volumes = [
+      "${vars.serviceConfigRoot}/grafana:/var/lib/grafana"
+    ];
+    # image doesn't consume PUID/PGID
+    user = null;
+    homepage = {
+      group = "Services";
+      name = "Grafana";
+      icon = "grafana";
+      description = "Dashboards";
     };
   };
 }

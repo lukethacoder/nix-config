@@ -52,22 +52,22 @@ in
   services.samba = {
     enable = true;
     openFirewall = true;
-    invalidUsers = [
-      "root"
-    ];
-    securityType = "user";
-    # extraConfig = ''
-    #   workgroup = WORKGROUP
-    #   server string = ${config.networking.hostName}
-    #   netbios name = ${config.networking.hostName}
-    #   security = user
-    #   hosts allow = 192.168.0.0/16 localhost
-    #   hosts deny = 0.0.0.0/0
-    #   guest account = nobody
-    #   map to guest = bad user
-    #   passdb backend = tdbsam
-    # '';
-    shares = smb_shares;
+    settings = {
+      global = {
+        security = "user";
+        "invalid users" = [
+          "root"
+        ];
+        # workgroup = "WORKGROUP";
+        # "server string" = config.networking.hostName;
+        # "netbios name" = config.networking.hostName;
+        # "hosts allow" = "192.168.0.0/16 localhost";
+        # "hosts deny" = "0.0.0.0/0";
+        # "guest account" = "nobody";
+        # "map to guest" = "bad user";
+        # "passdb backend" = "tdbsam";
+      };
+    } // smb_shares;
   };
 
   services.avahi = {

@@ -46,24 +46,22 @@
       variant = "";
     };
 
-    # Enable the GNOME Desktop Environment.
-    desktopManager.gnome.enable = true;
-    displayManager = {
-      gdm = {
-        enable = true;
-        autoSuspend = false;
-      };
-    };
-
     # disable xterm
     excludePackages = [ pkgs.xterm ];
+  };
+
+  # Enable the GNOME Desktop Environment.
+  services.desktopManager.gnome.enable = true;
+  services.displayManager.gdm = {
+    enable = true;
+    autoSuspend = false;
   };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;

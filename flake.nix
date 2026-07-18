@@ -86,6 +86,7 @@
             ./modules/podman
             ./modules/email
             ./modules/claude
+            ./modules/homelab
 
             # Disko
             # ./disko/opslag.nix
