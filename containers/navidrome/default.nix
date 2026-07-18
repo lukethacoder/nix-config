@@ -5,7 +5,7 @@ let
     "${vars.serviceConfigRoot}/navidrome-mixes"
     "${vars.mainArray}/Media/Music"
   ];
-  VERSION = "0.61.0";
+  VERSION = "0.63.1";
 in {
   systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
 
