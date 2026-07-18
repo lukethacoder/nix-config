@@ -1,7 +1,7 @@
 { vars, pkgs, ... }:
 let
   # adjust to bump the version when required
-  jellyfinVersion = "10.11.5";
+  jellyfinVersion = "10.11.11";
 in {
   nixpkgs.config.packageOverrides = pkgs: {
     vaapiIntel = pkgs.vaapiIntel.override {
