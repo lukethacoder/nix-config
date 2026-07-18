@@ -78,6 +78,7 @@
             ./modules/gnome
             ./modules/podman
             ./modules/email
+            ./modules/claude
 
             # Disko
             # ./disko/opslag.nix
