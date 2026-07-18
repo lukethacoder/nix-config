@@ -4,6 +4,7 @@
   home.stateVersion = "24.05";
 
   imports = [
+    ./claude-skills.nix
     ./gitconfig.nix
     ./vscode.nix
     ./zed.nix

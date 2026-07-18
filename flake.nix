@@ -6,6 +6,11 @@
 
     claude-code-nix.url = "github:sadjow/claude-code-nix";
 
+    claude-skills = {
+      url = "github:mattpocock/skills";
+      flake = false;
+    };
+
     # disko.url = "github:nix-community/disko";
     # disko.inputs.nixpkgs.follows = "nixpkgs";
 

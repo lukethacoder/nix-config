@@ -19,6 +19,22 @@
         "type": "github"
       }
     },
+    "claude-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784192592,
+        "narHash": "sha256-S6pARK99oGGSi6XdFm6zYKHT4gjOCN0wIPZFcl1hREE=",
+        "owner": "mattpocock",
+        "repo": "skills",
+        "rev": "9603c1cc8118d08bc1b3bf34cf714f62178dea3b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mattpocock",
+        "repo": "skills",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -61,10 +77,10 @@
     "nix-secrets": {
       "flake": false,
       "locked": {
-        "lastModified": 1784341919,
-        "narHash": "sha256-7+S7RxFGHJgVgHqY14i2Wyu7H2Oz8cFbruCRnUHjXxU=",
+        "lastModified": 1784352005,
+        "narHash": "sha256-dMTfpjkLNDG4Vv2Eto907HjDng+XCQFR8blLMnTqzb4=",
         "ref": "main",
-        "rev": "0c3fde46a0bea7d882127b895498e6ea17123127",
+        "rev": "7ce4273caff56e41df193af834776a282699911c",
         "shallow": true,
         "type": "git",
         "url": "ssh://git@github.com/lukethacoder/nix-private.git"
@@ -111,6 +127,7 @@
     "root": {
       "inputs": {
         "claude-code-nix": "claude-code-nix",
+        "claude-skills": "claude-skills",
         "home-manager": "home-manager",
         "nix-secrets": "nix-secrets",
         "nixpkgs": "nixpkgs_2",
