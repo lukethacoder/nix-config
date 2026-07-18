@@ -1,4 +1,4 @@
-{ config, vars, ... }:
+{ config, pkgs, vars, ... }:
 let
   VERSION = "0.63.1";
   sharedEnv = {
@@ -7,6 +7,20 @@ let
     ND_SESSIONTIMEOUT = "24h";
     ND_LASTFM_ENABLED = "true";
   };
+
+  # Navidrome discovers plugins as raw .ndp packages in the plugins folder
+  # (extracted directories are ignored) and registers them in its DB; each
+  # plugin still has to be enabled and granted library access in the UI.
+  ARTIST_NFO_VERSION = "1.3.0";
+  navidromePlugins = pkgs.runCommand "navidrome-plugins" { } ''
+    mkdir $out
+    # Reads artist biography/images from Kodi-style <artist>/artist.nfo files in the library.
+    # https://github.com/metalheim/navidrome-plugin-artist-nfo-metadata
+    cp ${pkgs.fetchurl {
+      url = "https://github.com/metalheim/navidrome-plugin-artist-nfo-metadata/releases/download/v${ARTIST_NFO_VERSION}/artist-nfo-metadata.ndp";
+      hash = "sha256-VNfMDJQXX4q/n14Z0QOevO+AhaogoBj/WWb3iycIzok=";
+    }} $out/artist-nfo-metadata.ndp
+  '';
 in {
   homelab.services.navidrome = {
     image = "deluan/navidrome:${VERSION}";
@@ -21,12 +35,16 @@ in {
     volumes = [
       "${vars.serviceConfigRoot}/navidrome:/data"
       "${vars.mainArray}/Media/Music/Music:/music:ro"
+      "${navidromePlugins}:/plugins:ro"
     ];
     # data on disk is owned by uid 1000; normalize to the share identity later
     user = { uid = 1000; gid = 1000; };
     env = sharedEnv // {
       ND_BASEURL = "http://navidrome.${vars.domainName}";
       ND_PROMETHEUS_ENABLED = "true";
+      ND_PLUGINS_ENABLED = "true";
+      ND_PLUGINS_FOLDER = "/plugins";
+      ND_AGENTS = "artist-nfo-metadata,lastfm";
     };
     environmentFiles = [
       config.sops.templates."navidrome-env".path
