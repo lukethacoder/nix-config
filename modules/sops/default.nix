@@ -60,6 +60,11 @@ in
       "mealie/token" = {};
       "claude-code/oauth_token" = {};
       samba_password = {};
+      "ssh/signing_private_key" = {
+        path = "/home/luke/.ssh/id_ed25519";
+        owner = "luke";
+        mode = "0600";
+      };
     };
 
     templates = {
