@@ -2,26 +2,27 @@
 {
   programs.git = {
     enable = true;
-    userName = "lukethacoder";
-    userEmail = "13529535+lukethacoder@users.noreply.github.com";
 
-    aliases = {
-      s = "status";
-      p = "push";
-      pl = "pull";
-      cm = "commit -m";
-      a = "add";
-      f = "fetch";
-      c = "checkout";
-    };
+    settings = {
+      user = {
+        name = "lukethacoder";
+        email = "13529535+lukethacoder@users.noreply.github.com";
+        signingKey = "${config.home.homeDirectory}/.ssh/id_ed25519";
+      };
 
-    extraConfig = {
+      alias = {
+        s = "status";
+        p = "push";
+        pl = "pull";
+        cm = "commit -m";
+        a = "add";
+        f = "fetch";
+        c = "checkout";
+      };
+
       gpg.format = "ssh";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
       commit.gpgsign = true;
-      user = {
-        signingKey = "${config.home.homeDirectory}/.ssh/id_ed25519";
-      };
       push.autoSetupRemote = true;
     };
   };

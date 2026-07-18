@@ -66,7 +66,10 @@ let
           options = {
             group = mkOption { type = types.str; };
             name = mkOption { type = types.str; };
-            icon = mkOption { type = types.str; };
+            icon = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+            };
             description = mkOption { type = types.str; };
             href = mkOption {
               type = types.nullOr types.str;
@@ -98,11 +101,13 @@ let
   enabledServices = lib.filterAttrs (_: s: s.enable) config.homelab.services;
 
   traefikLabels = name: s:
-    lib.optionals (s.subdomain != null) [
+    lib.optionals (s.subdomain != null) ([
       "-l=traefik.enable=true"
       "-l=traefik.http.routers.${name}.rule=Host(`${s.subdomain}.${vars.domainName}`)"
-      "-l=traefik.http.services.${name}.loadbalancer.server.port=${toString s.port}"
-    ];
+    ]
+    # port omitted = traefik auto-detects from the exposed port
+    ++ lib.optional (s.port != null)
+      "-l=traefik.http.services.${name}.loadbalancer.server.port=${toString s.port}");
 
   homepageLabels = name: s:
     lib.optionals (s.homepage != null) (
@@ -113,7 +118,9 @@ let
       [
         "-l=homepage.group=${hp.group}"
         "-l=homepage.name=${hp.name}"
-        "-l=homepage.icon=${hp.icon}"
+      ]
+      ++ lib.optional (hp.icon != null) "-l=homepage.icon=${hp.icon}"
+      ++ [
         "-l=homepage.href=${href}"
         "-l=homepage.description=${hp.description}"
       ]

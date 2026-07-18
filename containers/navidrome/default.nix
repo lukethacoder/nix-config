@@ -1,103 +1,86 @@
-{ config, vars, pkgs, ... }:
-let 
-  directories = [
-    "${vars.serviceConfigRoot}/navidrome"
-    "${vars.serviceConfigRoot}/navidrome-mixes"
-    "${vars.mainArray}/Media/Music"
-  ];
+{ config, vars, ... }:
+let
   VERSION = "0.63.1";
+  sharedEnv = {
+    ND_SCANSCHEDULE = "1h";
+    ND_LOGLEVEL = "info";
+    ND_SESSIONTIMEOUT = "24h";
+    ND_LASTFM_ENABLED = "true";
+  };
 in {
-  systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
-
-  system.userActivationScripts.navidrome-data.text = ''
-    mkdir -p ${vars.serviceConfigRoot}/navidrome \
-      ${vars.mainArray}/Media/Music/Music \
-      ${vars.serviceConfigRoot}/navidrome-mixes \
-      ${vars.mainArray}/Media/Music/Mixes
-  '';
-
-  virtualisation.oci-containers = {
-    containers = {
-      navidrome = {
-        image = "deluan/navidrome:${VERSION}";
-        autoStart = true;
-        ports = [ "4533:4533" ];
-        volumes = [
-          "${vars.serviceConfigRoot}/navidrome:/data"
-          "${vars.mainArray}/Media/Music/Music:/music:ro"
-        ];
-        environment = {
-          TZ = config.sops.secrets.time_zone.path;
-          PUID = "1000";
-          PGID = "1000";
-          ND_SCANSCHEDULE = "1h";
-          ND_LOGLEVEL = "info";
-          ND_SESSIONTIMEOUT = "24h";
-          ND_BASEURL = "http://navidrome.${vars.domainName}";
-          ND_LASTFM_ENABLED = "true";
-          ND_PROMETHEUS_ENABLED = "true";
-        };
-        environmentFiles = [
-          config.sops.templates."navidrome-env".path
-        ];
-        extraOptions = [
-          "--pull=newer"
-          "-l=traefik.enable=true"
-          "-l=traefik.http.routers.navidrome.rule=Host(`navidrome.${vars.domainName}`)"
-          "-l=traefik.http.services.navidrome.loadbalancer.server.port=4533"
-          "-l=homepage.group=Media"
-          "-l=homepage.name=Navidrome"
-          "-l=homepage.icon=navidrome.svg"
-          "-l=homepage.href=https://navidrome.${vars.domainName}"
-          "-l=homepage.description=Media player"
-          "-l=homepage.widget.type=navidrome"
-          "-l=homepage.widget.user={{HOMEPAGE_FILE_NAVIDROME_USERNAME}}"
-          "-l=homepage.widget.token={{HOMEPAGE_FILE_NAVIDROME_TOKEN}}"
-          "-l=homepage.widget.salt={{HOMEPAGE_FILE_NAVIDROME_SALT}}"
-          "-l=homepage.widget.url=https://navidrome.${vars.domainName}"
-        ];
+  homelab.services.navidrome = {
+    image = "deluan/navidrome:${VERSION}";
+    subdomain = "navidrome";
+    port = 4533;
+    publishPorts = [ "4533:4533" ];
+    dirs = [
+      "${vars.serviceConfigRoot}/navidrome"
+      "${vars.mainArray}/Media/Music"
+      "${vars.mainArray}/Media/Music/Music"
+    ];
+    volumes = [
+      "${vars.serviceConfigRoot}/navidrome:/data"
+      "${vars.mainArray}/Media/Music/Music:/music:ro"
+    ];
+    # data on disk is owned by uid 1000; normalize to the share identity later
+    user = { uid = 1000; gid = 1000; };
+    env = sharedEnv // {
+      ND_BASEURL = "http://navidrome.${vars.domainName}";
+      ND_PROMETHEUS_ENABLED = "true";
+    };
+    environmentFiles = [
+      config.sops.templates."navidrome-env".path
+    ];
+    homepage = {
+      group = "Media";
+      name = "Navidrome";
+      icon = "navidrome.svg";
+      description = "Media player";
+      widget = {
+        type = "navidrome";
+        user = "{{HOMEPAGE_FILE_NAVIDROME_USERNAME}}";
+        token = "{{HOMEPAGE_FILE_NAVIDROME_TOKEN}}";
+        salt = "{{HOMEPAGE_FILE_NAVIDROME_SALT}}";
+        url = "https://navidrome.${vars.domainName}";
       };
-      # Separate instance purely for DJ Mixes
-      # TODO: multi libraries are now supported - migrate when possible
-      navidrome_mixes = {
-        image = "deluan/navidrome:${VERSION}";
-        autoStart = true;
-        ports = [ "4534:4533" ];
-        volumes = [
-          "${vars.serviceConfigRoot}/navidrome-mixes:/data"
-          "${vars.mainArray}/Media/Music/Mixes:/music:ro"
-        ];
-        environment = {
-          TZ = config.sops.secrets.time_zone.path;
-          PUID = "1000";
-          PGID = "1000";
-          ND_SCANSCHEDULE = "1h";
-          ND_LOGLEVEL = "info";
-          ND_SESSIONTIMEOUT = "24h";
-          ND_BASEURL = "http://mixes.${vars.domainName}";
-          ND_LASTFM_ENABLED = "true";
-          # ND_LASTFM_APIKEY = config.sops.secrets."lastfm/api_key".path;
-          # ND_LASTFM_SECRET = config.sops.secrets."lastfm/api_secret".path;
-        };
-        environmentFiles = [
-          config.sops.templates."navidrome-env".path
-        ];
-        extraOptions = [
-          "--pull=newer"
-          "-l=traefik.enable=true"
-          "-l=traefik.http.routers.navidromemixes.rule=Host(`mixes.${vars.domainName}`)"
-          "-l=traefik.http.services.navidromemixes.loadbalancer.server.port=4533"
-          "-l=homepage.group=Media"
-          "-l=homepage.name=Navidrome Mixes"
-          "-l=homepage.icon=https://simpleicons.org/icons/pioneerdj.svg"
-          "-l=homepage.href=https://mixes.${vars.domainName}"
-          "-l=homepage.description=Media player"
-          "-l=homepage.widget.type=navidrome"
-          "-l=homepage.widget.user={{HOMEPAGE_FILE_NAVIDROME_USERNAME}}"
-          "-l=homepage.widget.token={{HOMEPAGE_FILE_NAVIDROME_TOKEN}}"
-          "-l=homepage.widget.salt={{HOMEPAGE_FILE_NAVIDROME_SALT}}"
-          "-l=homepage.widget.url=https://mixes.${vars.domainName}"
-        ];
+    };
+  };
+
+  # Separate instance purely for DJ Mixes
+  # TODO: multi libraries are now supported - migrate when possible
+  homelab.services.navidrome_mixes = {
+    image = "deluan/navidrome:${VERSION}";
+    subdomain = "mixes";
+    port = 4533;
+    publishPorts = [ "4534:4533" ];
+    dirs = [
+      "${vars.serviceConfigRoot}/navidrome-mixes"
+      "${vars.mainArray}/Media/Music/Mixes"
+    ];
+    volumes = [
+      "${vars.serviceConfigRoot}/navidrome-mixes:/data"
+      "${vars.mainArray}/Media/Music/Mixes:/music:ro"
+    ];
+    user = { uid = 1000; gid = 1000; };
+    env = sharedEnv // {
+      ND_BASEURL = "http://mixes.${vars.domainName}";
+      # ND_LASTFM_APIKEY = config.sops.secrets."lastfm/api_key".path;
+      # ND_LASTFM_SECRET = config.sops.secrets."lastfm/api_secret".path;
+    };
+    environmentFiles = [
+      config.sops.templates."navidrome-env".path
+    ];
+    homepage = {
+      group = "Media";
+      name = "Navidrome Mixes";
+      icon = "https://simpleicons.org/icons/pioneerdj.svg";
+      description = "Media player";
+      widget = {
+        type = "navidrome";
+        user = "{{HOMEPAGE_FILE_NAVIDROME_USERNAME}}";
+        token = "{{HOMEPAGE_FILE_NAVIDROME_TOKEN}}";
+        salt = "{{HOMEPAGE_FILE_NAVIDROME_SALT}}";
+        url = "https://mixes.${vars.domainName}";
       };
     };
   };

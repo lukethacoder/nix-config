@@ -1,10 +1,5 @@
-{ config, vars, pkgs, ... }:
+{ vars, pkgs, ... }:
 let
-  directories = [
-    "${vars.serviceConfigRoot}/copyparty/config"
-    "${vars.serviceConfigRoot}/copyparty/data"
-  ];
-
   # Copyparty Configuration
   copypartyConfig = pkgs.writeText "copyparty.conf" ''
     [global]
@@ -45,8 +40,6 @@ let
   '';
 in
 {
-  systemd.tmpfiles.rules = map (x: "d ${x} 0775 share share - -") directories;
-
   # Create a copyparty.conf file
   systemd.services."podman-copyparty" = {
     preStart = ''
@@ -59,44 +52,38 @@ in
 
   # TODO: configure prometheus/grafana
 
-  virtualisation.oci-containers = {
-    containers = {
-      copyparty = {
-        # using copyparty/iv instead of the default copyparty/ac for RAW thumbnail support
-        image = "copyparty/iv:latest";
-        autoStart = true;
-        ports = [ "3923:3923" ];
-        volumes = [
-          # the copyparty config folder
-          "${vars.serviceConfigRoot}/copyparty/config:/cfg:z"
+  homelab.services.copyparty = {
+    # using copyparty/iv instead of the default copyparty/ac for RAW thumbnail support
+    image = "copyparty/iv:latest";
+    subdomain = "drive";
+    port = 3923;
+    publishPorts = [ "3923:3923" ];
+    dirs = [
+      "${vars.serviceConfigRoot}/copyparty/config"
+      "${vars.serviceConfigRoot}/copyparty/data"
+    ];
+    volumes = [
+      # the copyparty config folder
+      "${vars.serviceConfigRoot}/copyparty/config:/cfg:z"
 
-          # where the data is stored
-          "${vars.serviceConfigRoot}/copyparty/data:/w:z"
-        ];
-        extraOptions = [
-          "--pull=newer"
-          "-l=traefik.enable=true"
-          "-l=traefik.http.routers.copyparty.rule=Host(`drive.${vars.domainName}`)"
-          "-l=traefik.http.services.copyparty.loadbalancer.server.port=3923"
-          "-l=traefik.entryPoints.web.transport.respondingTimeouts.readTimeout=0s"
-          "-l=homepage.group=Services"
-          "-l=homepage.name=copyparty"
-          "-l=homepage.icon=https://raw.githubusercontent.com/9001/copyparty/hovudstraum/docs/logo.svg"
-          "-l=homepage.href=https://drive.${vars.domainName}"
-          "-l=homepage.description=Files n things"
-        ];
-        environment = {
-          TZ = vars.timeZone;
-          PUID = "994";
-          GUID = "993";
+      # where the data is stored
+      "${vars.serviceConfigRoot}/copyparty/data:/w:z"
+    ];
+    env = {
+      # enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
+      LD_PRELOAD = "/usr/lib/libmimalloc-secure.so.NOPE";
 
-          # enable mimalloc by replacing "NOPE" with "2" for a nice speed-boost (will use twice as much ram)
-          LD_PRELOAD = "/usr/lib/libmimalloc-secure.so.NOPE";
-
-          # ensures log-messages are not delayed (but can reduce speed a tiny bit)
-          PYTHONUNBUFFERED = "1";
-        };
-      };
+      # ensures log-messages are not delayed (but can reduce speed a tiny bit)
+      PYTHONUNBUFFERED = "1";
+    };
+    extraPodmanArgs = [
+      "-l=traefik.entryPoints.web.transport.respondingTimeouts.readTimeout=0s"
+    ];
+    homepage = {
+      group = "Services";
+      name = "copyparty";
+      icon = "https://raw.githubusercontent.com/9001/copyparty/hovudstraum/docs/logo.svg";
+      description = "Files n things";
     };
   };
 }

@@ -3,7 +3,7 @@
   programs.vscode = {
     enable = true;
     package = pkgs.vscodium;
-    userSettings = {
+    profiles.default.userSettings = {
       "editor.fontFamily" = "'FiraCode Nerd Font', 'monospace', monospace";
       "editor.fontLigatures" = true;
       "editor.tabSize" = 2;
@@ -11,7 +11,7 @@
       "workbench.iconTheme" = "material-icon-theme";
       "window.zoomLevel" = -1;
     };
-    extensions = with pkgs.vscode-extensions; [
+    profiles.default.extensions = with pkgs.vscode-extensions; [
       wakatime.vscode-wakatime
     ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
       {
