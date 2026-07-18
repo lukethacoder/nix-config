@@ -17,11 +17,10 @@
 
     extraConfig = {
       gpg.format = "ssh";
-      gpg."ssh".program = "${lib.getExe' pkgs._1password-gui "op-ssh-sign"}";
       gpg.ssh.allowedSignersFile = "~/.ssh/allowed_signers";
       commit.gpgsign = true;
       user = {
-        signingKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKeuZFjh8UB3SPd8jwt6Mf2BLy0sQbThWN7HyssvxMvI";
+        signingKey = "${config.home.homeDirectory}/.ssh/id_ed25519";
       };
       push.autoSetupRemote = true;
     };
