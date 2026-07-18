@@ -1,4 +1,4 @@
-{ config, vars, ... }:
+{ config, lib, vars, ... }:
 {
   # No traefik labels here: deluge shares gluetun's network namespace, so the
   # `deluge` router labels live on the gluetun sidecar below.
@@ -43,8 +43,9 @@
   };
 
   # Sidecar: VPN gateway. Carries deluge's traefik router because deluge has
-  # no network of its own.
-  virtualisation.oci-containers.containers.gluetun = {
+  # no network of its own. Gated on deluge's enable flag so the qbittorrent
+  # stack (which defines its own gluetun) can be swapped in.
+  virtualisation.oci-containers.containers.gluetun = lib.mkIf config.homelab.services.deluge.enable {
     image = "qmcgaw/gluetun:latest";
     autoStart = true;
     extraOptions = [

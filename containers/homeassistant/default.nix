@@ -1,6 +1,7 @@
 { vars, ... }:
 {
   homelab.services.homeassistant = {
+    enable = false;
     image = "homeassistant/home-assistant:stable";
     subdomain = "homeassistant";
     port = 8123;

@@ -1,4 +1,4 @@
-{ pkgs, inputs, config, configVars, ... }:
+{ pkgs, inputs, config, ... }:
 let
   secretsDirectory = builtins.toString inputs.nix-secrets;
   secretsFile = "${secretsDirectory}/secrets.yaml";
@@ -29,9 +29,6 @@ in
     secrets = {
       domain_name = {};
       email_address = {};
-      "tailscale/otp" = {};
-      # "tailscale/host_domain" = {};
-      "duckdns/token" = {};
       "cloudflare/dns_api_key" = {};
       "wireguard/endpoint_ip" = {};
       "wireguard/endpoint_port" = {};
@@ -68,7 +65,6 @@ in
 
     templates = {
       "domainName".content = ''${config.sops.placeholder.domain_name}'';
-      # DUCKDNS_TOKEN=${config.sops.placeholder."duckdns/token"}
       "traefik-env".content = ''
         CF_DNS_API_TOKEN=${config.sops.placeholder."cloudflare/dns_api_key"}
       '';

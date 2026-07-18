@@ -41,33 +41,15 @@
   }@inputs:
     let
       system = "x86_64-linux";
-      # overlays = [
-      #   (self: super: {
-      #     go = super.go_1_24;
-      #   })
-      #   # (final: prev: {
-      #   #   # override go version to fix sops-nix issue?
-      #   #   go = final.pkgs.go_1_24;
-      #   #   sops-install-secrets = prev.sops-install-secrets.overrideAttrs (oldAttrs: {
-      #   #     buildInputs = (oldAttrs.buildInputs or []) ++ [ final.pkgs.go_1_24 ];
-      #   #   });
-      #   # })
-      # ];
-      # overlays = [
-      #   (final: prev: {
-      #     sops-install-secrets = prev.sops-install-secrets.overrideAttrs (oldAttrs: {
-      #       buildInputs = (oldAttrs.buildInputs or []) ++ [ final.pkgs.go_1_23 ];
-      #     });
-      #   })
-      # ];
-      pkgs = import nixpkgs {
-        inherit system;
-        # inherit overlays;
-      };
+
+      # Every directory under containers/ is a Service declaration and is
+      # imported automatically. Disable a service with
+      # `homelab.services.<name>.enable = false;` in its own file.
+      containerModules = nixpkgs.lib.mapAttrsToList
+        (name: _: ./containers/${name})
+        (nixpkgs.lib.filterAttrs (_: type: type == "directory")
+          (builtins.readDir ./containers));
     in {
-      # nix.extraOptions = ''
-      #   plugin-files = ${pkgs.nix-plugins}/lib/nix/plugins
-      # '';
       nixosConfigurations = {
         opslag = nixpkgs.lib.nixosSystem {
           inherit system;
@@ -77,10 +59,7 @@
           };
           modules = [
             # Base configuration and modules
-            ./modules/system
             ./modules/sops
-            # no longer used
-            # ./modules/tailscale
             ./modules/fonts
             ./modules/gnome
             ./modules/podman
@@ -96,24 +75,6 @@
             ./machines/nixos
             ./machines/nixos/opslag
 
-            # Services and applications
-            ./containers/homepage
-            ./containers/traefik
-            ./containers/deluge
-            # ./containers/qbittorrent
-            ./containers/miniflux
-            ./containers/prometheus
-            ./containers/grafana
-            ./containers/jellyfin
-            ./containers/navidrome
-            ./containers/copyparty
-            ./containers/mealie
-            ./containers/immich
-            ./containers/scrutiny
-            ./containers/albumz
-            ./containers/rsshub
-            # ./containers/homeassistant
-
             # Users
             ./users/luke
             home-manager.nixosModules.home-manager
@@ -125,13 +86,11 @@
                 vars = import ./machines/nixos/vars.nix;
               };
               home-manager.users.luke.imports = [
-                # agenix.homeManagerModules.default
-                # nix-index-database.hmModules.nix-index
                 ./users/luke/dots.nix
               ];
               home-manager.backupFileExtension = "bak";
             }
-          ];
+          ] ++ containerModules;
         };
       };
     };

@@ -1,6 +1,9 @@
-{ config, vars, ... }:
+{ config, lib, vars, ... }:
+let
+  enabled = config.homelab.services.qbittorrent.enable;
+in
 {
-  users = {
+  users = lib.mkIf enabled {
     groups.qbittorrent = {
       gid = 1100;
     };
@@ -14,6 +17,8 @@
   # No traefik labels here: qbittorrent shares gluetun's network namespace, so
   # the `qbittorrent` router labels live on the gluetun sidecar below.
   homelab.services.qbittorrent = {
+    # mutually exclusive with the deluge stack (both define gluetun)
+    enable = false;
     image = "linuxserver/qbittorrent:5.1.0";
     dirs = [
       "${vars.serviceConfigRoot}/qbittorrent"
@@ -59,8 +64,9 @@
   };
 
   # Sidecar: VPN gateway. Carries qbittorrent's traefik router because
-  # qbittorrent has no network of its own.
-  virtualisation.oci-containers.containers.gluetun = {
+  # qbittorrent has no network of its own. Gated so it can't collide with
+  # the deluge stack's gluetun.
+  virtualisation.oci-containers.containers.gluetun = lib.mkIf enabled {
     image = "qmcgaw/gluetun:latest";
     autoStart = true;
     extraOptions = [
@@ -95,7 +101,7 @@
     };
   };
 
-  system.activationScripts.giveUserAccessToQbittorrentDir =
+  system.activationScripts.giveUserAccessToQbittorrentDir = lib.mkIf enabled (
     let
       user = config.users.users.luke.name;
       group = config.users.users.luke.group;
@@ -110,5 +116,6 @@
         chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/qbittorrent
         chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/Downloads
         chown -R ${userSystem}:${groupSystem} ${vars.serviceConfigRoot}/Downloads.tmp
-      '';
+      ''
+  );
 }
