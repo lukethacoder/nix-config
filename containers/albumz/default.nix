@@ -1,7 +1,7 @@
 { config, vars, ... }:
 let
   # adjust to bump the version when required
-  albumzVersion = "0.1.1";
+  albumzVersion = "0.1.2";
 
   # albumz config root dir
   rootDir = "${vars.serviceConfigRoot}/albumz";
