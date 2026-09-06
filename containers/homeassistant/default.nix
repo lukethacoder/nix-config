@@ -14,8 +14,11 @@
 #      commissioning is link-local multicast and does not route across VLANs.
 #   5. Reverse proxy last: check both the traefik route and the websocket (the
 #      HA UI goes blank on a broken WS while plain HTTP still looks fine).
-#      HA must also trust the proxy or it answers 400 — that lives in
-#      ./configuration.yaml, mounted read-only over HA's own copy.
+#      HA must also trust the proxy or it answers 400. That is not a YAML
+#      setting any more — HA migrated http config into its own storage and
+#      ignores an http: block after the one-time migration. Set it under
+#      Settings > System > Network; it persists in .storage/ on the persist
+#      volume, and applies as a 5-minute trial that must be confirmed.
 #
 # Recovery: every service keeps its state on the persist volume, so recreating a
 # container costs nothing. services/matter-server holds the Matter fabric and
@@ -120,9 +123,6 @@ in
     dirs = [ haStateDir ];
     volumes = [
       "${haStateDir}:/config"
-      # Owned by nix, mounted over the copy HA created at onboarding (which
-      # stays underneath, so removing this line reverts cleanly).
-      "${./configuration.yaml}:/config/configuration.yaml:ro"
       "/etc/localtime:/etc/localtime:ro"
     ];
     # The official image runs as root and ignores PUID/PGID.
