@@ -24,7 +24,7 @@
 # container costs nothing. services/matter-server holds the Matter fabric and
 # services/otbr the Thread credentials — losing either means re-commissioning
 # every device. Replacing the radio is only a new `radio.device` path.
-{ lib, vars, ... }:
+{ lib, pkgs, vars, ... }:
 let
   homeassistantImage = "docker.io/homeassistant/home-assistant:2026.8.2";
   matterServerImage = "ghcr.io/matter-js/matterjs-server:1.4.0";
@@ -41,17 +41,22 @@ let
   # turns on both the traefik router and the homepage tile.
   lanAddress = null; # e.g. "192.168.8.20"
 
-  # Flick to true once a radio is plugged in and `radio.device` is confirmed.
-  otbrEnabled = false;
+  # One switch for the whole Thread stack: the OTBR container, the host sysctls
+  # and kernel modules it needs, and the Thread firewall port.
+  otbrEnabled = true;
 
-  # Home Assistant Connect ZBT-2 (the chosen radio), dedicated to Thread — this
-  # radio does not also do Zigbee. Ships Thread-capable firmware, so nothing to
-  # flash.
-  # TODO: real path from `ls -l /dev/serial/by-id/`; never a bare
+  # Home Assistant Connect ZBT-2, dedicated to Thread — the radio runs one
+  # protocol at a time and this one is Thread's.
+  #
+  # It ships running ZIGBEE firmware and must be reflashed with OpenThread RCP
+  # firmware before OTBR can talk to it; see the flasher below. 460800 baud with
+  # hardware flow control is the ZBT-2's rate and matches the defaults in Home
+  # Assistant's own OTBR app.
+  # The by-id path is what udev actually created (-> ttyACM0); never a bare
   # /dev/ttyACM0, that number moves. An nRF52840 dongle is the cheap alternative:
-  # flash ot-rcp firmware first, then baudrate = 1000000; flowControl = false;
+  # flash ot-rcp, then baudrate = 1000000; flowControl = false;
   radio = {
-    device = "/dev/serial/by-id/usb-Nabu_Casa_Home_Assistant_Connect_ZBT-2_SERIAL-if00-port0";
+    device = "/dev/serial/by-id/usb-Nabu_Casa_ZBT-2_94A990D05CCC-if00";
     baudrate = 460800;
     flowControl = true;
   };
@@ -79,9 +84,26 @@ in
     "net.ipv6.conf.all.accept_ra" = 2;
   };
 
-  # ip6table_filter: OTBR installs its own IPv6 firewall rules at start.
-  # tun: OTBR creates the wpan0 Thread interface through /dev/net/tun.
-  boot.kernelModules = lib.optionals otbrEnabled [ "ip6table_filter" "tun" ];
+  # OTBR builds its own ip6tables chains backed by ipsets at start, and creates
+  # the wpan0 Thread interface through /dev/net/tun. A container cannot modprobe,
+  # so the host loads what that needs.
+  boot.kernelModules = lib.optionals otbrEnabled [
+    "ip6table_filter"
+    "ip_set"
+    "ip_set_hash_net"
+    "xt_set"
+    "tun"
+  ];
+
+  # lsusb, for identifying the radio on the USB bus. The ZBT-2 should appear as
+  # 303a:831a or 303a:4001; 303a:1001 ("USB JTAG/serial debug unit") means its
+  # ESP32 bridge fell back to ROM mode and a power cycle is needed.
+  #
+  # Flashing the ZBT-2 requires `nixpkgs#python3Packages.universal-silabs-flasher`
+  # can use nix shell if/when we need it:
+  #   nix shell nixpkgs#python3Packages.universal-silabs-flasher
+  #   universal-silabs-flasher --device <by-id path> probe
+  environment.systemPackages = [ pkgs.usbutils ];
 
   networking.firewall = {
     # 8123 — Home Assistant, direct on the LAN (independent of traefik).
@@ -168,8 +190,8 @@ in
   };
 
   # Thread border router
-  # Disabled until the radio exists — see `otbrEnabled` above. HA's otbr
-  # integration talks to the REST API on localhost:8081.
+  # Gated on `otbrEnabled` above. HA's otbr integration talks to the REST API on
+  # localhost:8081.
   homelab.services.otbr = {
     enable = otbrEnabled;
     image = otbrImage;
@@ -192,8 +214,10 @@ in
     extraPodmanArgs = [
       "--network=host"
       # NET_ADMIN covers the wpan0 interface, routing and firewall rules OTBR
-      # sets up; full --privileged is not required.
+      # sets up; IPC_LOCK matches HA's own OTBR app. Full --privileged is not
+      # required.
       "--cap-add=NET_ADMIN"
+      "--cap-add=IPC_LOCK"
       # stable by-id path on the host, fixed path inside the container
       "--device=${radio.device}:${radioDeviceInContainer}"
       "--device=/dev/net/tun"
