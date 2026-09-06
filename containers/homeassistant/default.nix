@@ -39,7 +39,7 @@ let
   # Leave null until direct LAN access is confirmed working: null keeps Home
   # Assistant LAN-only (http://<opslag>:8123) and off the dashboard, setting it
   # turns on both the traefik router and the homepage tile.
-  lanAddress = null; # e.g. "192.168.8.20"
+  lanAddress = "192.168.8.20";
 
   # One switch for the whole Thread stack: the OTBR container, the host sysctls
   # and kernel modules it needs, and the Thread firewall port.
