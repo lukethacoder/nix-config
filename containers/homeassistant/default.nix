@@ -12,8 +12,8 @@
 #      http://localhost:8081. The Thread panel should report a preferred network.
 #   4. Commission from the phone app, on the same LAN as opslag — Matter
 #      commissioning is link-local multicast and does not route across VLANs.
-#   5. Set lanAddress last, then check both the traefik route and the websocket
-#      (the HA UI goes blank on a broken WS while plain HTTP still looks fine).
+#   5. Reverse proxy last: check both the traefik route and the websocket (the
+#      HA UI goes blank on a broken WS while plain HTTP still looks fine).
 #      HA must also be told to trust the proxy, in its own configuration.yaml —
 #      HA rewrites that file, so it is not templated from nix:
 #        http:
@@ -33,13 +33,6 @@ let
   # OTBR's backbone/infrastructure interface: the LAN NIC that carries IPv6.
   # NOTE: confirm with `ip route get 1.1.1.1` / `ip -br link`.
   lanInterface = "eno2";
-
-  # opslag's LAN address. Home Assistant runs on the host network, so traefik
-  # cannot discover a container IP for it — routing needs an explicit server URL.
-  # Leave null until direct LAN access is confirmed working: null keeps Home
-  # Assistant LAN-only (http://<opslag>:8123) and off the dashboard, setting it
-  # turns on both the traefik router and the homepage tile.
-  lanAddress = "192.168.8.202";
 
   # One switch for the whole Thread stack: the OTBR container, the host sysctls
   # and kernel modules it needs, and the Thread firewall port.
@@ -122,9 +115,11 @@ in
     # Host networking: mDNS/SSDP discovery and Matter's link-local IPv6 traffic
     # do not survive podman's bridge. Nothing is published — the container binds
     # the host directly, so HA stays reachable on the LAN with traefik down.
-    subdomain = if lanAddress == null then null else "ha";
-    # host-net container: traefik gets an explicit server URL below instead
-    port = null;
+    subdomain = "ha";
+    # Required even on host networking: traefik's docker provider resolves a
+    # host-mode container via host.containers.internal, but still errors with
+    # "port is missing" if no port label is emitted, and drops the whole service.
+    port = 8123;
     dirs = [ haStateDir ];
     volumes = [
       "${haStateDir}:/config"
@@ -132,23 +127,17 @@ in
     ];
     # The official image runs as root and ignores PUID/PGID.
     user = null;
-    extraPodmanArgs = [
-      "--network=host"
-    ] ++ lib.optional (lanAddress != null)
-      "-l=traefik.http.services.homeassistant.loadbalancer.server.url=http://${lanAddress}:8123";
-    homepage =
-      if lanAddress == null then
-        null
-      else {
-        group = "Services";
-        name = "Home Assistant";
-        icon = "home-assistant.svg";
-        description = "Home automation";
-        widget = {
-          type = "homeassistant";
-          url = "https://ha.${vars.domainName}";
-        };
+    extraPodmanArgs = [ "--network=host" ];
+    homepage = {
+      group = "Services";
+      name = "Home Assistant";
+      icon = "home-assistant.svg";
+      description = "Home automation";
+      widget = {
+        type = "homeassistant";
+        url = "https://ha.${vars.domainName}";
       };
+    };
   };
 
   # This container runs unprivileged as uid 1000 (the python server ran as root),
