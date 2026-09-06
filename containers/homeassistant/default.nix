@@ -9,7 +9,7 @@
 #      dashboard (node detail, Thread mesh view) on http://localhost:5580/ —
 #      loopback-bound, so reach it over an ssh tunnel.
 #   3. otbrEnabled = true, then the OpenThread Border Router integration ->
-#      http://localhost:8081. The Thread panel should report a preferred network.
+#      http://localhost:8085. The Thread panel should report a preferred network.
 #   4. Commission from the phone app, on the same LAN as opslag — Matter
 #      commissioning is link-local multicast and does not route across VLANs.
 #   5. Reverse proxy last: check both the traefik route and the websocket (the
@@ -37,6 +37,13 @@ let
   # One switch for the whole Thread stack: the OTBR container, the host sysctls
   # and kernel modules it needs, and the Thread firewall port.
   otbrEnabled = true;
+
+  # OTBR's REST API, which the Home Assistant integration talks to. NOT the
+  # upstream default of 8081: OTBR runs on the host netns and immich already
+  # publishes 8081 for its metrics (see containers/immich), so OTBR loses the
+  # bind and logs "REST server failed to start". Bound to loopback — only Home
+  # Assistant, which shares the host netns, needs to reach it.
+  restPort = 8085;
 
   # Home Assistant Connect ZBT-2, dedicated to Thread — the radio runs one
   # protocol at a time and this one is Thread's.
@@ -180,7 +187,7 @@ in
 
   # Thread border router
   # Gated on `otbrEnabled` above. HA's otbr integration talks to the REST API on
-  # localhost:8081.
+  # localhost:8085 (see restPort above for why it is not the upstream 8081).
   homelab.services.otbr = {
     enable = otbrEnabled;
     image = otbrImage;
@@ -194,6 +201,8 @@ in
       OT_RCP_DEVICE = radioUrl;
       OT_INFRA_IF = lanInterface;
       OT_THREAD_IF = "wpan0";
+      OT_REST_LISTEN_ADDR = "127.0.0.1";
+      OT_REST_LISTEN_PORT = toString restPort;
       # The OTBR web GUI binds :80, which traefik owns, and HA does not need it
       # (the integration only uses the REST API). In some builds this is a
       # build-time option, so after enabling OTBR check `ss -ltnp | grep ':80 '`;
