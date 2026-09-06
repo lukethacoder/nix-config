@@ -17,6 +17,66 @@ The Home Assistant Connect ZBT-2 is **dedicated to Thread**. The radio runs one
 protocol at a time, so this host cannot also do Zigbee. A Zigbee device needs a
 second radio.
 
+## How it fits together
+
+```mermaid
+graph TB
+    subgraph phone["Android phone"]
+        app["HA companion app"]
+        gps["Play Services<br>Thread credential store"]
+    end
+
+    subgraph host["opslag"]
+        subgraph netns["host network namespace - all three containers"]
+            ha["homeassistant<br>:8123"]
+            matter["matter-server<br>127.0.0.1:5580"]
+            otbr["otbr<br>127.0.0.1:8085 REST"]
+        end
+        avahi["avahi-daemon<br>host, shared with SMB"]
+        eno2(["eno2 - LAN"])
+        wpan0(["wpan0 - Thread"])
+    end
+
+    zbt["ZBT-2 dongle<br>OpenThread RCP"]
+
+    subgraph mesh["Thread mesh"]
+        b1["KAJPLATS"]
+        b2["KAJPLATS"]
+    end
+
+    app -->|"HTTPS + WebSocket, via traefik"| ha
+    ha -->|"ws://localhost:5580/ws"| matter
+    ha -->|"REST - reads the dataset"| otbr
+
+    otbr -->|"spinel+hdlc+uart over USB"| zbt
+    zbt --- wpan0
+    otbr -->|"publishes _meshcop._udp"| avahi
+    avahi --- eno2
+    eno2 -.->|"border router discovery"| app
+
+    ha -.->|"credential sync"| gps
+    gps -.-> app
+    app -->|"BLE - commissioning only"| b1
+
+    wpan0 --- mesh
+    matter -->|"Matter over IPv6, OMR prefix"| mesh
+```
+
+Four distinct paths, easily conflated:
+
+- **Radio** — `otbr` drives the ZBT-2 over USB and owns `wpan0`. This is the only
+  thing that makes a Thread mesh exist.
+- **Discovery** — `otbr` publishes a `_meshcop._udp` record advertising the
+  border agent. HA and the phone both find the border router this way, so it must
+  land on the LAN segment the phone is on. Note the container shares the host
+  netns, so it publishes through the *host's* `avahi-daemon` — the same one
+  serving the SMB shares.
+- **Credentials** — the Thread dataset flows `otbr` → HA (REST) → companion app →
+  Play Services. The phone hands it to the bulb over BLE. Nothing joins the mesh
+  until this path is complete, and it is entirely separate from the radio path.
+- **Operation** — once joined, `matter-server` talks to the bulb over IPv6 on the
+  OMR prefix, routed via `wpan0`. HA never speaks Thread directly.
+
 ## First-time bring-up
 
 Do these in order. Each step assumes the previous one is verified.
