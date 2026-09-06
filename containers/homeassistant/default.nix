@@ -205,7 +205,15 @@ in
       # NET_ADMIN covers the wpan0 interface, routing and firewall rules OTBR
       # sets up; IPC_LOCK matches HA's own OTBR app. Full --privileged is not
       # required.
+      #
+      # NET_RAW is the one podman does not hand out by default and docker does,
+      # so every OTBR-in-docker guide omits it. Without it otbr-agent brings up
+      # wpan0, then dies opening its raw ICMPv6 socket for MLD:
+      #   mldListenerInit() at netif.cpp:2137: Failure
+      #   socket(SOCK_CLOEXEC): Operation not permitted
+      # s6 then tears the container down and systemd restarts it, forever.
       "--cap-add=NET_ADMIN"
+      "--cap-add=NET_RAW"
       "--cap-add=IPC_LOCK"
       # stable by-id path on the host, fixed path inside the container
       "--device=${radio.device}:${radioDeviceInContainer}"
