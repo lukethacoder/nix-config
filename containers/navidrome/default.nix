@@ -1,6 +1,6 @@
 { config, pkgs, vars, ... }:
 let
-  VERSION = "0.63.1";
+  VERSION = "0.64.2";
   sharedEnv = {
     ND_SCANSCHEDULE = "1h";
     ND_LOGLEVEL = "info";
@@ -78,12 +78,14 @@ in {
     volumes = [
       "${vars.serviceConfigRoot}/navidrome-mixes:/data"
       "${vars.mainArray}/Media/Music/Mixes:/music:ro"
+      "${navidromePlugins}:/plugins:ro"
     ];
     user = { uid = 1000; gid = 1000; };
     env = sharedEnv // {
       ND_BASEURL = "http://mixes.${vars.domainName}";
-      # ND_LASTFM_APIKEY = config.sops.secrets."lastfm/api_key".path;
-      # ND_LASTFM_SECRET = config.sops.secrets."lastfm/api_secret".path;
+      ND_PLUGINS_ENABLED = "true";
+      ND_PLUGINS_FOLDER = "/plugins";
+      ND_AGENTS = "artist-nfo-metadata,lastfm";
     };
     environmentFiles = [
       config.sops.templates."navidrome-env".path
